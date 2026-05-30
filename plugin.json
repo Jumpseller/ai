@@ -1,0 +1,8 @@
+{
+  "name": "jumpseller-plugin",
+  "version": "1.0.0",
+  "author": "Jumpseller",
+  "license": "MIT",
+  "description": "Jumpseller developer tools for AI assistants — build themes and integrations with accurate platform context.",
+  "keywords": ["jumpseller", "liquid", "rest-api", "mcp", "ecommerce", "theme"]
+}
