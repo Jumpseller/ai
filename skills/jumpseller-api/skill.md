@@ -2,24 +2,32 @@
 
 Use this skill when integrating with the Jumpseller REST API to manage store data programmatically.
 
-## Authentication
-
-Every request must include two HTTP headers:
-
-| Header | Value |
-|---|---|
-| `X-LOGIN-KEY` | Your store's Login Key |
-| `X-AUTH-TOKEN` | Your store's Auth Token |
-
-Retrieve credentials from: **Admin Panel → Account Settings → API Tokens**.
-
 ## Base URL
 
 ```
-https://{login}.jumpseller.com/api/v1/
+https://api.jumpseller.com/v1/
 ```
 
-`{login}` is your store's login name — the subdomain of your Jumpseller store URL.
+All endpoints use this central API domain regardless of the store's subdomain.
+
+## Authentication
+
+Append your credentials as query parameters to every request:
+
+```
+?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
+```
+
+Retrieve credentials from: **Admin Panel → Account Settings → API Tokens**.
+
+## URL Format
+
+All endpoints require a `.json` extension:
+
+```
+GET https://api.jumpseller.com/v1/products.json?login=LOGIN_KEY&authtoken=AUTH_TOKEN
+GET https://api.jumpseller.com/v1/orders/1234.json?login=LOGIN_KEY&authtoken=AUTH_TOKEN
+```
 
 ## Request Format
 
@@ -38,100 +46,132 @@ List endpoints accept `page` and `limit` query params:
 
 To retrieve all records: increment `page` until the number of returned items is less than `limit`.
 
+## Rate Limiting
+
+100 requests per minute per account. On `429`, wait 60 seconds before retrying. For bulk operations, add a small delay (e.g. 100ms) between requests to avoid hitting the limit.
+
 ## Resources
 
 ### Products
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/products` | List products |
-| `GET` | `/products/{id}` | Get a product |
-| `POST` | `/products` | Create a product |
-| `PUT` | `/products/{id}` | Update a product |
-| `DELETE` | `/products/{id}` | Delete a product |
-| `GET` | `/products/count` | Count all products |
-| `GET` | `/products/{id}/variants` | List a product's variants |
-| `POST` | `/products/{id}/variants` | Add a variant to a product |
-| `PUT` | `/products/{id}/variants/{variant_id}` | Update a variant |
-| `DELETE` | `/products/{id}/variants/{variant_id}` | Delete a variant |
-| `POST` | `/products/{id}/images` | Upload a product image |
-| `DELETE` | `/products/{id}/images/{image_id}` | Delete a product image |
+| `GET` | `/products.json` | List products |
+| `GET` | `/products/{id}.json` | Get a product |
+| `POST` | `/products.json` | Create a product |
+| `PUT` | `/products/{id}.json` | Update a product |
+| `DELETE` | `/products/{id}.json` | Delete a product |
+| `GET` | `/products/count.json` | Count all products |
+| `GET` | `/products/{id}/variants.json` | List a product's variants |
+| `POST` | `/products/{id}/variants.json` | Add a variant |
+| `PUT` | `/products/{id}/variants/{variant_id}.json` | Update a variant |
+| `DELETE` | `/products/{id}/variants/{variant_id}.json` | Delete a variant |
+| `GET` | `/products/{id}/images.json` | List product images |
+| `POST` | `/products/{id}/images.json` | Upload a product image |
+| `DELETE` | `/products/{id}/images/{image_id}.json` | Delete an image |
 
-Key product fields: `name`, `description`, `price`, `stock`, `sku`, `status` (`available` or `unavailable`), `weight`, `categories` (array of category IDs), `images`.
+Key product fields: `name`, `description`, `price`, `compare_at_price`, `cost_per_item`, `stock`, `stock_unlimited`, `sku`, `brand`, `barcode`, `status` (`available` or `unavailable`), `type` (`physical` or `digital`), `weight`, `package_format` (`box`, `tube`, or `envelope`), `length`, `width`, `height`, `shipping_required`, `featured`, `categories`, `images`, `variants`, `permalink`.
 
 ### Orders
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/orders` | List orders |
-| `GET` | `/orders/{id}` | Get an order |
-| `PUT` | `/orders/{id}` | Update order status or tracking |
-| `GET` | `/orders/count` | Count orders |
+| `GET` | `/orders.json` | List all orders |
+| `GET` | `/orders/{id}.json` | Get an order |
+| `PUT` | `/orders/{id}.json` | Update order status or tracking |
+| `GET` | `/orders/count.json` | Count all orders |
+| `GET` | `/orders/status/{status_enum}.json` | List orders by status |
 
-Order status values: `Pending`, `Paid`, `Shipped`, `Delivered`, `Canceled`.
+**Valid order status enums:**
 
-Filter orders: `GET /orders?status=Paid&page=1&limit=50`
+| status_enum | Status name |
+|---|---|
+| `pending_payment` | Pending Payment |
+| `paid` | Paid |
+| `canceled` | Canceled |
+| `abandoned` | Abandoned |
+
+Order status (`status_enum`) tracks payment state. Shipment state is tracked separately via `shipment_status_enum` (e.g. `unfulfilled`, `fulfilled`).
+
+Key order fields: `id`, `status`, `status_name`, `status_enum`, `currency`, `subtotal`, `tax`, `shipping`, `total`, `discount`, `fulfillment_status`, `shipment_status_enum`, `tracking_number`, `tracking_company`, `tracking_url`, `customer`, `shipping_address`, `billing_address`, `products`, `source`.
 
 ### Customers
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/customers` | List customers |
-| `GET` | `/customers/{id}` | Get a customer |
-| `POST` | `/customers` | Create a customer |
-| `PUT` | `/customers/{id}` | Update a customer |
-| `GET` | `/customers/count` | Count customers |
-| `GET` | `/customers/{id}/addresses` | List a customer's addresses |
-| `POST` | `/customers/{id}/addresses` | Add an address |
+| `GET` | `/customers.json` | List customers |
+| `GET` | `/customers/{id}.json` | Get a customer |
+| `POST` | `/customers.json` | Create a customer |
+| `PUT` | `/customers/{id}.json` | Update a customer |
+| `GET` | `/customers/count.json` | Count customers |
 
-Search customers: `GET /customers?email=user@example.com`
+Search customers by email: `GET /customers.json?email=user@example.com&login=...&authtoken=...`
+
+Customer objects include `shipping_addresses` and `billing_addresses` arrays.
 
 ### Categories
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/categories` | List all categories |
-| `GET` | `/categories/{id}` | Get a category |
-| `POST` | `/categories` | Create a category |
-| `PUT` | `/categories/{id}` | Update a category |
-| `DELETE` | `/categories/{id}` | Delete a category |
+| `GET` | `/categories.json` | List all categories |
+| `GET` | `/categories/{id}.json` | Get a category |
+| `POST` | `/categories.json` | Create a category |
+| `PUT` | `/categories/{id}.json` | Update a category |
+| `DELETE` | `/categories/{id}.json` | Delete a category |
+
+Category fields: `id`, `name`, `description`, `images`, `parent_id`, `permalink`, `products`.
 
 ### Pages
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/pages` | List custom pages |
-| `GET` | `/pages/{id}` | Get a page |
-| `POST` | `/pages` | Create a page |
-| `PUT` | `/pages/{id}` | Update a page |
-| `DELETE` | `/pages/{id}` | Delete a page |
+| `GET` | `/pages.json` | List custom pages |
+| `GET` | `/pages/{id}.json` | Get a page |
+| `POST` | `/pages.json` | Create a page |
+| `PUT` | `/pages/{id}.json` | Update a page |
+| `DELETE` | `/pages/{id}.json` | Delete a page |
 
-### Store
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/store` | Get store configuration and info |
-
-Returns: store name, currency, country, contact email, plan, languages.
+Page fields: `id`, `title`, `body`, `status` (`public`/`hidden`), `legal`, `permalink`, `template`.
 
 ### Webhooks
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/hooks` | List webhooks |
-| `POST` | `/hooks` | Register a webhook |
-| `DELETE` | `/hooks/{id}` | Delete a webhook |
+| `GET` | `/hooks.json` | List webhooks |
+| `POST` | `/hooks.json` | Register a webhook |
+| `DELETE` | `/hooks/{id}.json` | Delete a webhook |
 
-Events: `order/created`, `order/updated`, `order/paid`, `order/shipped`, `product/created`, `product/updated`, `product/deleted`, `customer/created`.
+Webhook fields: `id`, `name`, `event`, `url`, `application_id`.
+
+Events: `order_created`, `order_updated`, `order_paid`, `order_shipped`, `product_created`, `product_updated`, `product_deleted`, `customer_created`.
 
 ### Promotions
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/promotions` | List promotions |
-| `POST` | `/promotions` | Create a promotion |
-| `PUT` | `/promotions/{id}` | Update a promotion |
-| `DELETE` | `/promotions/{id}` | Delete a promotion |
+| `GET` | `/promotions.json` | List promotions |
+| `GET` | `/promotions/{id}.json` | Get a promotion |
+| `POST` | `/promotions.json` | Create a promotion |
+| `PUT` | `/promotions/{id}.json` | Update a promotion |
+| `DELETE` | `/promotions/{id}.json` | Delete a promotion |
+
+Promotion fields: `id`, `name`, `discount_target`, `discount_amount_fix`, `discount_amount_percent`, `begins_at`, `expires_at`, `max_times_used`, `times_used`, `cumulative`, `enabled`, `customers`, `coupons`, `categories`, `products`.
+
+### Shipping Methods
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/shipping_methods.json` | List configured shipping methods |
+
+Shipping method fields: `id`, `type`, `name`, `enabled`, `free_shipping`, `free_shipping_minimum_purchase`, `fee`, `services` (array of `{id, name, service_code}`).
+
+### Payment Methods
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/payment_methods.json` | List configured payment methods |
+
+Payment method fields: `id`, `type`, `name`.
 
 ## Error Handling
 
@@ -139,22 +179,13 @@ Events: `order/created`, `order/updated`, `order/paid`, `order/shipped`, `produc
 |---|---|
 | `200` | Success |
 | `201` | Created successfully |
-| `400` | Bad request — malformed body or missing required fields |
+| `400` | Bad request — malformed body, missing fields, or invalid parameter value |
 | `401` | Unauthorized — invalid or missing credentials |
 | `404` | Resource not found |
-| `422` | Validation error — field-level errors in the response body |
-| `429` | Rate limit exceeded — wait 60 seconds before retrying |
+| `422` | Validation error — field-level errors in response body |
+| `429` | Rate limit exceeded — wait 60 seconds |
 | `500` | Server error |
-
-Error response body:
-```json
-{ "error": "Description of what went wrong" }
-```
-
-## Rate Limiting
-
-100 requests per minute per account. When you receive `429`, wait 60 seconds before retrying. For bulk operations, add a small delay between requests (e.g., 100ms) to avoid hitting the limit.
 
 ## Examples
 
-See `examples/products.md`, `examples/orders.md`, and `examples/customers.md` for complete request and response examples.
+See `examples/products.md`, `examples/orders.md`, `examples/customers.md`, `examples/shipping.md`, and `examples/promotions.md` for complete request and response examples.
