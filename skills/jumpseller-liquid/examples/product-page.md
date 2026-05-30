@@ -5,7 +5,6 @@
 ```liquid
 <div class="product-page">
 
-  <!-- Image gallery -->
   <div class="product-images">
     {% for image in product.images %}
       <img
@@ -16,48 +15,52 @@
     {% endfor %}
   </div>
 
-  <!-- Product info -->
   <div class="product-info">
     <h1>{{ product.name }}</h1>
 
-    <!-- Price -->
     <div class="product-price">
       {% if product.compare_at_price > product.price %}
         <span class="price-compare">{{ product.compare_at_price | money }}</span>
+        <span class="badge-sale">Sale</span>
       {% endif %}
       <span class="price">{{ product.price | money }}</span>
     </div>
 
-    <!-- Description -->
     <div class="product-description">
       {{ product.description }}
     </div>
 
-    <!-- Variants (if any) -->
-    {% if product.variants.size > 0 %}
+    {% unless product.variants == empty %}
       <div class="product-variants">
+        <label for="variant-select">{{ 'product.choose_variant' | t }}</label>
         <select name="variant_id" id="variant-select">
           {% for variant in product.variants %}
             <option
               value="{{ variant.id }}"
-              {% if variant.stock <= 0 %}disabled{% endif %}
+              {% if variant.stock <= 0 and variant.stock_unlimited == false %}disabled{% endif %}
             >
-              {% for option in variant.options %}{{ option.value }}{% unless forloop.last %} / {% endunless %}{% endfor %}
+              {% for option in variant.options %}
+                {{ option.value }}{% unless forloop.last %} / {% endunless %}
+              {% endfor %}
               — {{ variant.price | money }}
             </option>
           {% endfor %}
         </select>
       </div>
-    {% endif %}
+    {% endunless %}
 
-    <!-- Add to cart -->
     <form action="/cart/add" method="post">
       <input type="hidden" name="product_id" value="{{ product.id }}">
       <input type="number" name="quantity" value="1" min="1">
-      {% if product.status == 'available' and product.stock > 0 %}
-        <button type="submit">{{ 'product.add_to_cart' | t }}</button>
+
+      {% if product.status == 'available' and product.stock > 0 or product.stock_unlimited %}
+        <button type="submit" class="btn-add-to-cart">
+          {{ 'product.add_to_cart' | t }}
+        </button>
       {% else %}
-        <button type="button" disabled>{{ 'product.out_of_stock' | t }}</button>
+        <button type="button" class="btn-sold-out" disabled>
+          {{ 'product.out_of_stock' | t }}
+        </button>
       {% endif %}
     </form>
 
