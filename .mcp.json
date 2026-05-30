@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "jumpseller": {
+      "type": "http",
+      "url": "https://mcp.jumpseller.com",
+      "headers": {
+        "X-LOGIN-KEY": "${JUMPSELLER_LOGIN_KEY}",
+        "X-AUTH-TOKEN": "${JUMPSELLER_AUTH_TOKEN}"
+      }
+    }
+  }
+}
