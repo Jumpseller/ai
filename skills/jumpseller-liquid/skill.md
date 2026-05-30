@@ -7,22 +7,22 @@ Use this skill when building or editing Jumpseller themes using the Liquid templ
 Liquid is the templating language used in Jumpseller themes. It has three types of delimiters:
 - `{{ variable }}` — outputs a value
 - `{% tag %}` — logic (if, for, assign, include, etc.)
-- `{% comment %} ... {% endcomment %}` — block comment, not rendered
+- `{# comment #}` — comment, not rendered
 
 ## Theme File Structure
 
 ```
 theme/
-├── templates/       # Page-level templates (product.liquid, cart.liquid, etc.)
-├── partials/        # Reusable fragments included in templates
-├── components/      # Configurable sections (each has .liquid + .json)
-├── assets/          # CSS, JS, images, fonts
-├── config/          # Theme settings (settings.json, settings_data.json)
-├── locales/         # Translation strings (en.json, es.json, etc.)
-└── .jumpseller-store  # Binds the theme to a store (contains store login domain)
+├── templates/          # Page-level templates (product.liquid, cart.liquid, etc.)
+├── partials/           # Reusable fragments included with {% include %}
+├── components/         # Configurable sections — each has a .liquid + .json pair
+├── assets/             # CSS, JS, images, fonts
+├── config/             # Theme settings (settings.json, settings_data.json)
+├── locales/            # Translation strings (en.json, es.json, etc.)
+└── .jumpseller-store   # Binds the theme to a store (contains the store domain)
 ```
 
-The `.jumpseller-store` file contains the store's domain (e.g., `your-store.jumpseller.com`). Do not commit credentials here — it is used by the Jumpseller CLI to know which store to sync with.
+The `.jumpseller-store` file contains the store's domain (e.g. `your-store.jumpseller.com`). It is used by the Jumpseller CLI to know which store to sync with. Do not commit API credentials here.
 
 ## Global Liquid Objects
 
@@ -31,23 +31,23 @@ These objects are available in all templates:
 | Object | Description |
 |---|---|
 | `store` | Store configuration: name, currency, country, logo, social links |
-| `product` | Current product (on product pages) |
-| `collection` | Current category/collection (on category pages) |
+| `product` | Current product (available on product pages) |
+| `collection` | Current category/collection (available on category pages) |
 | `cart` | Current cart: items, totals, item count |
-| `customer` | Logged-in customer (nil if not logged in) |
-| `order` | Current order (on order confirmation pages) |
+| `customer` | Logged-in customer (`nil` if not logged in) |
+| `order` | Current order (available on order confirmation pages) |
 | `page` | Current custom page |
-| `checkout` | Checkout state (on checkout pages) |
+| `checkout` | Checkout state (available on checkout pages) |
 | `theme` | Theme metadata |
 
 ### `store` object
 
 ```liquid
-{{ store.name }}          <!-- Store name -->
-{{ store.currency }}      <!-- e.g. "USD" -->
-{{ store.country }}       <!-- e.g. "US" -->
-{{ store.email }}         <!-- Contact email -->
-{{ store.logo }}          <!-- Logo URL -->
+{{ store.name }}        <!-- Store name -->
+{{ store.currency }}    <!-- e.g. "USD" -->
+{{ store.country }}     <!-- e.g. "US" -->
+{{ store.email }}       <!-- Contact email -->
+{{ store.logo }}        <!-- Logo URL -->
 ```
 
 ### `product` object
@@ -60,20 +60,15 @@ These objects are available in all templates:
 {{ product.compare_at_price | money }}
 {{ product.sku }}
 {{ product.stock }}
-{{ product.status }}      <!-- "available" or "unavailable" -->
-{{ product.url }}         <!-- URL to the product page -->
+{{ product.status }}        <!-- "available" or "unavailable" -->
+{{ product.permalink }}
 
 {% for image in product.images %}
-  <img src="{{ image.url }}" alt="{{ image.alt }}">
+  <img src="{{ image.url }}" alt="{{ product.name }}">
 {% endfor %}
 
 {% for variant in product.variants %}
-  {{ variant.id }}
   {{ variant.sku }} — {{ variant.price | money }}
-  {{ variant.stock }}
-  {% for option in variant.options %}
-    {{ option.name }}: {{ option.value }}
-  {% endfor %}
 {% endfor %}
 
 {% for category in product.categories %}
@@ -92,9 +87,7 @@ These objects are available in all templates:
   {{ item.quantity }}
   {{ item.price | money }}
   {{ item.line_price | money }}
-  {{ item.image }}          <!-- product image URL -->
-  {{ item.url }}            <!-- URL to the product page -->
-  {{ item.variant_title }}  <!-- variant label, nil if no variant -->
+  {% if item.variant_title %}{{ item.variant_title }}{% endif %}
 {% endfor %}
 ```
 
@@ -104,8 +97,9 @@ These objects are available in all templates:
 {% if customer %}
   {{ customer.name }}
   {{ customer.email }}
+  {{ customer.orders_count }}
 {% else %}
-  <!-- Not logged in -->
+  <!-- visitor is not logged in -->
 {% endif %}
 ```
 
@@ -114,27 +108,27 @@ These objects are available in all templates:
 ```liquid
 {{ collection.name }}
 {{ collection.description }}
+{{ collection.current_page }}
+{{ collection.total_pages }}
 
 {% for product in collection.products %}
-  {{ product.name }}
+  {{ product.name }} — {{ product.price | money }}
 {% endfor %}
-
-<!-- Pagination -->
-{{ collection.current_page }} / {{ collection.total_pages }}
 ```
 
 ## Liquid Filters
 
 ### Money formatting
 ```liquid
-{{ product.price | money }}           <!-- formats with store currency -->
-{{ product.price | money_without_currency }}
+{{ product.price | money }}                     <!-- with currency symbol -->
+{{ product.price | money_without_currency }}    <!-- number only -->
 ```
 
 ### Image resizing
 ```liquid
-{{ image.url | product_image_url: '300x300' }}
-{{ image.url | product_image_url: '600x' }}    <!-- width only -->
+{{ image.url | product_image_url: '400x400' }}  <!-- crop to square -->
+{{ image.url | product_image_url: '800x' }}     <!-- scale by width only -->
+{{ image.url | product_image_url: 'x600' }}     <!-- scale by height only -->
 ```
 
 ### String filters
@@ -143,78 +137,88 @@ These objects are available in all templates:
 {{ product.name | downcase }}
 {{ product.description | strip_html }}
 {{ product.description | truncate: 150 }}
+{{ product.name | slugify }}
 ```
 
 ### Translation
 ```liquid
 {{ 'cart.checkout' | t }}             <!-- looks up key in locales/ -->
 {{ 'product.add_to_cart' | t }}
+{{ 'product.out_of_stock' | t }}
+{{ 'pagination.prev' | t }}
+{{ 'pagination.next' | t }}
+```
+
+### Array filters
+```liquid
+{{ product.images | first }}
+{{ product.images.size }}
+{{ product.variants | map: 'price' | min }}
 ```
 
 ## Including Partials
 
 ```liquid
+{% include 'partials/product-card' %}
 {% include 'partials/product-card', product: product %}
 {% include 'partials/header' %}
 {% include 'partials/footer' %}
 ```
 
-Pass variables to a partial by adding them after the path as named arguments.
+Pass variables to a partial by adding them as named arguments after the path.
 
 ## Component System
 
-Components are configurable sections that merchants can customize from the theme editor. Each component has two files:
+Components are configurable sections that merchants can customize from the theme editor without touching code. Each component has two files:
 
 **`components/my-component.json`** — defines the settings schema:
 ```json
 {
   "name": "My Component",
   "settings": [
-    {
-      "type": "text",
-      "id": "title",
-      "label": "Title",
-      "default": "Welcome"
-    },
-    {
-      "type": "image",
-      "id": "background_image",
-      "label": "Background Image"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text Color",
-      "default": "#000000"
-    },
-    {
-      "type": "select",
-      "id": "layout",
-      "label": "Layout",
+    { "type": "text",     "id": "title",            "label": "Title",            "default": "Welcome" },
+    { "type": "textarea", "id": "subtitle",          "label": "Subtitle",         "default": "" },
+    { "type": "richtext", "id": "body",              "label": "Body Text",        "default": "" },
+    { "type": "image",    "id": "background_image",  "label": "Background Image" },
+    { "type": "color",    "id": "text_color",        "label": "Text Color",       "default": "#000000" },
+    { "type": "select",   "id": "layout",            "label": "Layout",
       "options": [
-        { "value": "left", "label": "Left" },
+        { "value": "left",   "label": "Left" },
         { "value": "center", "label": "Center" }
       ],
       "default": "center"
-    }
+    },
+    { "type": "checkbox", "id": "show_button",       "label": "Show Button",      "default": true },
+    { "type": "number",   "id": "columns",           "label": "Columns",          "default": 3 },
+    { "type": "url",      "id": "button_url",        "label": "Button URL",       "default": "/" }
   ]
 }
 ```
 
 Setting types: `text`, `textarea`, `richtext`, `image`, `color`, `select`, `checkbox`, `number`, `url`.
 
-**`components/my-component.liquid`** — uses the settings:
+**`components/my-component.liquid`** — accesses settings via `component.settings.{id}`:
 ```liquid
-<div class="my-component" style="color: {{ component.settings.text_color }}">
+<div class="my-component layout-{{ component.settings.layout }}"
+     style="color: {{ component.settings.text_color }}">
+
   <h2>{{ component.settings.title }}</h2>
+
+  {% if component.settings.subtitle != blank %}
+    <p>{{ component.settings.subtitle }}</p>
+  {% endif %}
+
   {% if component.settings.background_image %}
     <img src="{{ component.settings.background_image | product_image_url: '1200x' }}"
          alt="{{ component.settings.title }}">
   {% endif %}
+
+  {% if component.settings.show_button %}
+    <a href="{{ component.settings.button_url }}">Learn more</a>
+  {% endif %}
+
 </div>
 ```
-
-Access settings in a component via `component.settings.{setting_id}`.
 
 ## Common Patterns
 
@@ -232,20 +236,43 @@ Access settings in a component via `component.settings.{setting_id}`.
 ### Product availability check
 ```liquid
 {% if product.status == 'available' and product.stock > 0 %}
-  <button type="submit">Add to Cart</button>
+  <button type="submit">{{ 'product.add_to_cart' | t }}</button>
+{% elsif product.status == 'available' and product.stock_unlimited %}
+  <button type="submit">{{ 'product.add_to_cart' | t }}</button>
 {% else %}
-  <button disabled>Out of Stock</button>
+  <button disabled>{{ 'product.out_of_stock' | t }}</button>
+{% endif %}
+```
+
+### Sale badge
+```liquid
+{% if product.compare_at_price > product.price %}
+  <span class="badge-sale">Sale</span>
 {% endif %}
 ```
 
 ### Paginating a collection
 ```liquid
 {% if collection.total_pages > 1 %}
-  {% if collection.current_page > 1 %}
-    <a href="?page={{ collection.current_page | minus: 1 }}">Previous</a>
-  {% endif %}
-  {% if collection.current_page < collection.total_pages %}
-    <a href="?page={{ collection.current_page | plus: 1 }}">Next</a>
-  {% endif %}
+  <nav class="pagination">
+    {% if collection.current_page > 1 %}
+      <a href="?page={{ collection.current_page | minus: 1 }}">&larr; {{ 'pagination.prev' | t }}</a>
+    {% endif %}
+    <span>{{ collection.current_page }} / {{ collection.total_pages }}</span>
+    {% if collection.current_page < collection.total_pages %}
+      <a href="?page={{ collection.current_page | plus: 1 }}">{{ 'pagination.next' | t }} &rarr;</a>
+    {% endif %}
+  </nav>
 {% endif %}
+```
+
+### Assign and capture
+```liquid
+{% assign sale = false %}
+{% if product.compare_at_price > product.price %}
+  {% assign sale = true %}
+{% endif %}
+
+{% capture product_url %}/products/{{ product.permalink }}{% endcapture %}
+<a href="{{ product_url }}">{{ product.name }}</a>
 ```
