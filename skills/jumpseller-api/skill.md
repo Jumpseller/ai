@@ -180,13 +180,47 @@ Page fields: `id`, `title`, `body`, `status` (`public`/`hidden`), `legal`, `perm
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/hooks.json` | List webhooks |
+| `GET` | `/hooks.json` | List all webhooks |
+| `GET` | `/hooks/{id}.json` | Get a webhook |
 | `POST` | `/hooks.json` | Register a webhook |
+| `PUT` | `/hooks/{id}.json` | Update a webhook |
 | `DELETE` | `/hooks/{id}.json` | Delete a webhook |
 
 Webhook fields: `id`, `name`, `event`, `url`, `application_id`.
 
-Events: `order_created`, `order_updated`, `order_paid`, `order_shipped`, `product_created`, `product_updated`, `product_deleted`, `customer_created`.
+**Valid event values (from swagger spec):**
+
+| Event | Trigger |
+|---|---|
+| `order_pending_payment` | New order created |
+| `order_paid` | Order payment confirmed |
+| `order_shipped` | Order shipped to customer |
+| `order_canceled` | Order canceled |
+| `order_abandoned` | Cart abandoned |
+| `order_updated` | Any order state change |
+| `product_created` | New product added |
+| `product_updated` | Product details changed |
+| `product_deleted` | Product removed |
+| `product_stock_updated` | Product stock changed |
+| `customer_created` | New customer registered |
+| `customer_updated` | Customer profile changed |
+| `customer_deleted` | Customer removed |
+
+**Webhook payload:** Jumpseller POSTs JSON to your URL using the same structure as the REST API for that resource. Expects a `2xx` response within 15 seconds. Retries up to 4 times on failure (`N^4` minutes apart). After 8 failed attempts the webhook is paused and the store admin is notified.
+
+**Request headers sent by Jumpseller:**
+
+| Header | Example value | Description |
+|---|---|---|
+| `Content-Type` | `application/json` | Always JSON |
+| `Jumpseller-Store-Code` | `your-store` | Store subdomain |
+| `Jumpseller-Event` | `order_paid` | Event that fired |
+| `Jumpseller-Hmac-Sha256` | `jg/4O1Tr...` | HMAC-SHA256 signature |
+| `Jumpseller-Triggered-At` | `2025-01-01 10:18:51.829 UTC` | Timestamp |
+
+**Verifying authenticity:** The `Jumpseller-Hmac-Sha256` header is a Base64-encoded HMAC-SHA256 of the raw request body, signed with your store's **hooks token** (found at Admin Panel → Config → Notifications/Webhooks — this is different from the API auth token).
+
+See `examples/webhooks.md` for registration, payload, and HMAC verification examples.
 
 ### Promotions
 
@@ -231,4 +265,4 @@ Payment method fields: `id`, `type`, `name`.
 
 ## Examples
 
-See `examples/products.md`, `examples/orders.md`, `examples/customers.md`, `examples/shipping.md`, and `examples/promotions.md` for complete request and response examples.
+See `examples/products.md`, `examples/orders.md`, `examples/customers.md`, `examples/shipping.md`, `examples/promotions.md`, and `examples/webhooks.md` for complete request and response examples.
