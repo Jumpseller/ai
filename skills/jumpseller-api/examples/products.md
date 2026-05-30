@@ -1,12 +1,9 @@
 # Products API — Examples
 
-## List products (first page)
+## List products
 
-**Request:**
 ```
-GET https://your-login.jumpseller.com/api/v1/products?page=1&limit=50
-X-LOGIN-KEY: your-login-key
-X-AUTH-TOKEN: your-auth-token
+GET https://api.jumpseller.com/v1/products.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN&page=1&limit=50
 ```
 
 **Response:**
@@ -16,12 +13,36 @@ X-AUTH-TOKEN: your-auth-token
     "product": {
       "id": 1001,
       "name": "Classic T-Shirt",
+      "page_title": "Classic T-Shirt",
+      "description": "<p>100% cotton t-shirt.</p>",
       "price": 29.99,
+      "compare_at_price": null,
+      "cost_per_item": null,
+      "weight": 0.3,
       "stock": 100,
+      "stock_unlimited": false,
+      "stock_threshold": 0,
+      "stock_notification": false,
+      "back_in_stock_enabled": true,
       "sku": "TSH-001",
+      "brand": null,
+      "barcode": null,
+      "featured": false,
+      "reviews_enabled": true,
       "status": "available",
-      "categories": [{ "id": 5, "name": "Clothing" }],
-      "images": [{ "id": 1, "url": "https://cdn.jumpseller.com/products/tshirt.jpg", "position": 1 }]
+      "shipping_required": true,
+      "type": "physical",
+      "package_format": "box",
+      "length": 0.0,
+      "width": 0.0,
+      "height": 0.0,
+      "categories": [{ "id": 5, "name": "Clothing", "parent_id": null }],
+      "images": [{ "id": 1, "url": "https://images.jumpseller.com/store/your-store/1001/image.jpg", "position": 1 }],
+      "variants": [],
+      "fields": [],
+      "permalink": "classic-t-shirt",
+      "discount": "0.0",
+      "currency": "USD"
     }
   }
 ]
@@ -29,73 +50,72 @@ X-AUTH-TOKEN: your-auth-token
 
 ## Get a single product
 
-**Request:**
 ```
-GET https://your-login.jumpseller.com/api/v1/products/1001
-X-LOGIN-KEY: your-login-key
-X-AUTH-TOKEN: your-auth-token
+GET https://api.jumpseller.com/v1/products/1001.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
+```
+
+## Count products
+
+```
+GET https://api.jumpseller.com/v1/products/count.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
+```
+
+**Response:**
+```json
+{ "count": 42 }
 ```
 
 ## Create a product
 
-**Request:**
 ```
-POST https://your-login.jumpseller.com/api/v1/products
+POST https://api.jumpseller.com/v1/products.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
 Content-Type: application/json
-X-LOGIN-KEY: your-login-key
-X-AUTH-TOKEN: your-auth-token
 
 {
   "product": {
     "name": "Classic T-Shirt",
-    "description": "<p>100% cotton, available in multiple colors.</p>",
+    "description": "<p>100% cotton t-shirt.</p>",
     "price": 29.99,
     "stock": 100,
     "sku": "TSH-001",
     "status": "available",
-    "weight": 0.3
+    "weight": 0.3,
+    "type": "physical",
+    "package_format": "box"
   }
 }
 ```
 
-**Response:** `201 Created` with the created product object.
+**Response:** `201 Created` with the full product object.
 
 ## Update a product
 
-**Request:**
 ```
-PUT https://your-login.jumpseller.com/api/v1/products/1001
+PUT https://api.jumpseller.com/v1/products/1001.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
 Content-Type: application/json
-X-LOGIN-KEY: your-login-key
-X-AUTH-TOKEN: your-auth-token
 
 {
   "product": {
     "price": 24.99,
-    "status": "available"
+    "status": "available",
+    "stock": 85
   }
 }
 ```
 
 ## Delete a product
 
-**Request:**
 ```
-DELETE https://your-login.jumpseller.com/api/v1/products/1001
-X-LOGIN-KEY: your-login-key
-X-AUTH-TOKEN: your-auth-token
+DELETE https://api.jumpseller.com/v1/products/1001.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
 ```
 
 **Response:** `200 OK`
 
 ## Add a variant
 
-**Request:**
 ```
-POST https://your-login.jumpseller.com/api/v1/products/1001/variants
+POST https://api.jumpseller.com/v1/products/1001/variants.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
 Content-Type: application/json
-X-LOGIN-KEY: your-login-key
-X-AUTH-TOKEN: your-auth-token
 
 {
   "variant": {
@@ -110,28 +130,28 @@ X-AUTH-TOKEN: your-auth-token
 }
 ```
 
-## Bulk price update (iterate all products)
+## Bulk price update — iterate all products
 
 ```javascript
-const headers = {
-  'X-LOGIN-KEY': process.env.JUMPSELLER_LOGIN_KEY,
-  'X-AUTH-TOKEN': process.env.JUMPSELLER_AUTH_TOKEN,
-  'Content-Type': 'application/json'
-};
-const base = `https://your-login.jumpseller.com/api/v1`;
+const LOGIN = 'YOUR_LOGIN_KEY';
+const TOKEN = 'YOUR_AUTH_TOKEN';
+const BASE  = 'https://api.jumpseller.com/v1';
+const AUTH  = `login=${LOGIN}&authtoken=${TOKEN}`;
 
 let page = 1;
 while (true) {
-  const res = await fetch(`${base}/products?page=${page}&limit=200`, { headers });
+  const res      = await fetch(`${BASE}/products.json?${AUTH}&page=${page}&limit=200`);
   const products = await res.json();
   if (products.length === 0) break;
 
   for (const { product } of products) {
-    await fetch(`${base}/products/${product.id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({ product: { price: product.price * 1.1 } })
+    await fetch(`${BASE}/products/${product.id}.json?${AUTH}`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ product: { price: product.price * 1.1 } }),
     });
+    // Small delay to respect the 100 req/min rate limit
+    await new Promise(r => setTimeout(r, 100));
   }
   page++;
 }
