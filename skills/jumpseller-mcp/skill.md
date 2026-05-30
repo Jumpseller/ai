@@ -67,12 +67,15 @@ Register your app in the Jumpseller Partner Panel to receive a `client_id` and `
 | `create_category` | Create a new category |
 | `update_category` | Update category name or description |
 
-### Pages (2 tools)
+### Pages (5 tools)
 
 | Tool | Description |
 |---|---|
+| `get_pages` | List all custom pages in the store |
+| `get_page` | Get a single page by ID |
 | `create_page` | Create a new custom store page |
 | `update_page` | Update a page's content or title |
+| `delete_page` | Delete a custom page by ID |
 
 ### Store (1 tool)
 
