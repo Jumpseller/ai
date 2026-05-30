@@ -1,0 +1,22 @@
+{
+  "name": "jumpseller-plugin",
+  "version": "1.0.0",
+  "description": "Jumpseller developer tools — REST API, Liquid themes, and MCP server context for AI assistants.",
+  "skills": [
+    {
+      "name": "jumpseller-api",
+      "description": "Use when working with the Jumpseller REST API to manage products, orders, customers, categories, pages, webhooks, or any store resource.",
+      "path": "skills/jumpseller-api/skill.md"
+    },
+    {
+      "name": "jumpseller-liquid",
+      "description": "Use when building or editing Jumpseller themes, Liquid templates, partials, or theme components.",
+      "path": "skills/jumpseller-liquid/skill.md"
+    },
+    {
+      "name": "jumpseller-mcp",
+      "description": "Use when managing a Jumpseller store through MCP tools or conversational store operations.",
+      "path": "skills/jumpseller-mcp/skill.md"
+    }
+  ]
+}
