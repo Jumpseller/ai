@@ -140,7 +140,7 @@ const AUTH  = `login=${LOGIN}&authtoken=${TOKEN}`;
 
 let page = 1;
 while (true) {
-  const res      = await fetch(`${BASE}/products.json?${AUTH}&page=${page}&limit=200`);
+  const res      = await fetch(`${BASE}/products.json?${AUTH}&page=${page}&limit=100`);
   const products = await res.json();
   if (products.length === 0) break;
 
@@ -150,7 +150,7 @@ while (true) {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ product: { price: product.price * 1.1 } }),
     });
-    // Small delay to respect the 100 req/min rate limit
+    // Small delay to respect rate limits
     await new Promise(r => setTimeout(r, 100));
   }
   page++;

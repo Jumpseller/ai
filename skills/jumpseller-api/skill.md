@@ -12,11 +12,19 @@ All endpoints use this central API domain regardless of the store's subdomain.
 
 ## Authentication
 
-Append your credentials as query parameters to every request:
+Basic Auth is the **recommended** method:
+
+```bash
+curl -u YOUR_LOGIN_KEY:YOUR_AUTH_TOKEN https://api.jumpseller.com/v1/products.json
+```
+
+Query parameters work but are **deprecated**:
 
 ```
 ?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
 ```
+
+For third-party apps, use OAuth 2.0 — see https://jumpseller.com/support/oauth-2.
 
 Retrieve credentials from: **Admin Panel → Account Settings → API Tokens**.
 
@@ -42,15 +50,43 @@ List endpoints accept `page` and `limit` query params:
 | Param | Description | Default | Max |
 |---|---|---|---|
 | `page` | Page number, 1-indexed | `1` | — |
-| `limit` | Results per page | `50` | `200` |
+| `limit` | Results per page | `50` | `100` |
 
 To retrieve all records: increment `page` until the number of returned items is less than `limit`.
 
+Example:
+```
+https://api.jumpseller.com/v1/products.json?page=3&limit=100
+```
+
 ## Rate Limiting
 
-100 requests per minute per account. On `429`, wait 60 seconds before retrying. For bulk operations, add a small delay (e.g. 100ms) between requests to avoid hitting the limit.
+- **800 requests per minute**
+- **20 requests per second**
+- Rate limits apply per IP address AND per store
+- After 2000 rate-limit hits, a temporary ban is applied
+
+Response headers to monitor:
+
+```
+Jumpseller-PerMinuteRateLimit-Limit: 800
+Jumpseller-PerMinuteRateLimit-Remaining: 799
+Jumpseller-PerSecondRateLimit-Limit: 20
+Jumpseller-PerSecondRateLimit-Remaining: 19
+Jumpseller-BannedByRateLimit-Reset: 2024-05-23T16:13:47+00:00  (only when banned)
+```
+
+On `429`, check the headers and wait until the reset time before retrying.
 
 ## Resources
+
+### Store
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/store/info.json` | Get store information |
+
+Optional `fields` query param: comma-separated list of fields to return. Allowed values: `name`, `code`, `currency`, `country`, `timezone`, `email`, `hooks_token`, `url`, `subscription_plan`, `logo`, `weight_unit`, `fb_pixel_id`, `whatsapp_phone`, `mobile_app_version`, `subscription_status`, `checkout_version`, `address`.
 
 ### Products
 
@@ -69,6 +105,11 @@ To retrieve all records: increment `page` until the number of returned items is 
 | `GET` | `/products/{id}/images.json` | List product images |
 | `POST` | `/products/{id}/images.json` | Upload a product image |
 | `DELETE` | `/products/{id}/images/{image_id}.json` | Delete an image |
+| `GET` | `/products/search.json` | Search products |
+| `GET` | `/products/status/{status}.json` | List products by status |
+| `GET` | `/products/status/{status}/count.json` | Count products by status |
+
+Valid product status values: `available`, `unavailable`
 
 Key product fields: `name`, `description`, `price`, `compare_at_price`, `cost_per_item`, `stock`, `stock_unlimited`, `sku`, `brand`, `barcode`, `status` (`available` or `unavailable`), `type` (`physical` or `digital`), `weight`, `package_format` (`box`, `tube`, or `envelope`), `length`, `width`, `height`, `shipping_required`, `featured`, `categories`, `images`, `variants`, `permalink`.
 
@@ -81,6 +122,7 @@ Key product fields: `name`, `description`, `price`, `compare_at_price`, `cost_pe
 | `PUT` | `/orders/{id}.json` | Update order status or tracking |
 | `GET` | `/orders/count.json` | Count all orders |
 | `GET` | `/orders/status/{status_enum}.json` | List orders by status |
+| `GET` | `/orders/search.json` | Search/filter orders (supports `fulfillment_filters`, `status_filters[]`, `dateFilter` params) |
 
 **Valid order status enums:**
 
@@ -104,8 +146,9 @@ Key order fields: `id`, `status`, `status_name`, `status_enum`, `currency`, `sub
 | `POST` | `/customers.json` | Create a customer |
 | `PUT` | `/customers/{id}.json` | Update a customer |
 | `GET` | `/customers/count.json` | Count customers |
-
-Search customers by email: `GET /customers.json?email=user@example.com&login=...&authtoken=...`
+| `GET` | `/customers/email/{email}.json` | Get a customer directly by email address |
+| `GET` | `/customers/{id}/orders.json` | List all orders for a customer |
+| `GET` | `/customers/search.json` | Search customers |
 
 Customer objects include `shipping_addresses` and `billing_addresses` arrays.
 
