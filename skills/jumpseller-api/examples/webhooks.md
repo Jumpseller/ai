@@ -50,9 +50,17 @@ curl -u YOUR_LOGIN_KEY:YOUR_AUTH_TOKEN \
   -X DELETE https://api.jumpseller.com/v1/hooks/12345.json
 ```
 
-## Incoming webhook payload (order_paid example)
+## Incoming webhook payload
 
-When an order is paid, Jumpseller POSTs to your URL with these headers:
+**Webhook payloads are identical to the REST API response for that resource.** There is no separate payload format to learn.
+
+| Event | Payload structure |
+|---|---|
+| `order_*` | Same as `GET /orders/{id}.json` — see `examples/orders.md` |
+| `product_*` | Same as `GET /products/{id}.json` — see `examples/products.md` |
+| `customer_*` | Same as `GET /customers/{id}.json` — see `examples/customers.md` |
+
+Jumpseller POSTs to your URL with these headers:
 
 ```
 Content-Type: application/json
@@ -60,23 +68,6 @@ Jumpseller-Store-Code: your-store
 Jumpseller-Event: order_paid
 Jumpseller-Hmac-Sha256: jg/4O1TrK3fP7NX2ljNruHQsnhA9agn1TJu7lfn3R2s=
 Jumpseller-Triggered-At: 2025-01-01 10:18:51.829 UTC
-```
-
-And a JSON body with the full order object (same structure as `GET /orders/{id}.json`):
-
-```json
-{
-  "order": {
-    "id": 1026,
-    "status": "Paid",
-    "status_enum": "paid",
-    "currency": "USD",
-    "subtotal": 399.0,
-    "total": 369.2,
-    "customer": { "id": "123", "email": "test@gmail.com" },
-    "products": [{ "id": 10732902, "name": "Black", "qty": 1, "price": 399.0 }]
-  }
-}
 ```
 
 ## Verifying the HMAC signature
