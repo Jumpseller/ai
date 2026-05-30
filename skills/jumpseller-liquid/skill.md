@@ -7,7 +7,7 @@ Use this skill when building or editing Jumpseller themes using the Liquid templ
 Liquid is the templating language used in Jumpseller themes. It has three types of delimiters:
 - `{{ variable }}` — outputs a value
 - `{% tag %}` — logic (if, for, assign, include, etc.)
-- `{# comment #}` — comment, not rendered
+- `{% comment %} ... {% endcomment %}` — block comment, not rendered
 
 ## Theme File Structure
 
@@ -61,13 +61,19 @@ These objects are available in all templates:
 {{ product.sku }}
 {{ product.stock }}
 {{ product.status }}      <!-- "available" or "unavailable" -->
+{{ product.url }}         <!-- URL to the product page -->
 
 {% for image in product.images %}
   <img src="{{ image.url }}" alt="{{ image.alt }}">
 {% endfor %}
 
 {% for variant in product.variants %}
+  {{ variant.id }}
   {{ variant.sku }} — {{ variant.price | money }}
+  {{ variant.stock }}
+  {% for option in variant.options %}
+    {{ option.name }}: {{ option.value }}
+  {% endfor %}
 {% endfor %}
 
 {% for category in product.categories %}
@@ -82,7 +88,13 @@ These objects are available in all templates:
 {{ cart.total_price | money }}
 
 {% for item in cart.items %}
-  {{ item.name }} × {{ item.quantity }} = {{ item.line_price | money }}
+  {{ item.name }}
+  {{ item.quantity }}
+  {{ item.price | money }}
+  {{ item.line_price | money }}
+  {{ item.image }}          <!-- product image URL -->
+  {{ item.url }}            <!-- URL to the product page -->
+  {{ item.variant_title }}  <!-- variant label, nil if no variant -->
 {% endfor %}
 ```
 
