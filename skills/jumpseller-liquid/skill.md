@@ -24,6 +24,19 @@ theme/
 
 The `.jumpseller-store` file contains the store's domain (e.g. `your-store.jumpseller.com`). It is used by the Jumpseller CLI to know which store to sync with. Do not commit API credentials here.
 
+### Local theme development (Jumpseller CLI)
+
+Theme files are edited locally and synced to a store with the **Jumpseller CLI** — the official command-line tool for local theme development. It is a separate project: [`Jumpseller/jumpseller-cli`](https://github.com/Jumpseller/jumpseller-cli).
+
+```bash
+npm i -g @jumpseller/cli   # install globally
+
+jumpseller access          # set up store credentials
+jumpseller theme --help    # local theme development commands
+```
+
+For exact command syntax and options, refer to the `jumpseller-cli` repository and its `--help` output — it is still in early development, so treat its README as the source of truth rather than assuming command names.
+
 ## Global Liquid Objects
 
 These objects are available in all templates:

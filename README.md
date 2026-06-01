@@ -9,6 +9,8 @@ AI context for building Jumpseller themes and integrations. Install once and you
 - **`jumpseller-mcp` skill** — MCP server reference: all 20 tools, authentication setup, and common multi-step patterns.
 - **Pre-configured `.mcp.json`** — connects directly to `https://mcp.jumpseller.com`.
 
+For **local theme development**, see the separate [Jumpseller CLI](https://github.com/Jumpseller/jumpseller-cli) (`npm i -g @jumpseller/cli`) — the official tool for syncing themes between your machine and a store.
+
 ## Installation
 
 ### Claude Code
