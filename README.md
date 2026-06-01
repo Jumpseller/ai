@@ -14,22 +14,22 @@ AI context for building Jumpseller themes and integrations. Install once and you
 ### Claude Code
 
 ```
-/plugin marketplace add Jumpseller/jumpseller-ai-toolkit
-/plugin install jumpseller-plugin@jumpseller-ai-toolkit
+/plugin marketplace add Jumpseller/ai
+/plugin install jumpseller-plugin@ai
 ```
 
 ### OpenAI Codex
 
-Search for `jumpseller-ai-toolkit` in the Codex plugin interface, or run:
+Search for `Jumpseller/ai` in the Codex plugin interface, or run:
 
 ```bash
-codex plugin install github:Jumpseller/jumpseller-ai-toolkit
+codex plugin install github:Jumpseller/ai
 ```
 
 ### Gemini CLI
 
 ```bash
-gemini extension install github:Jumpseller/jumpseller-ai-toolkit
+gemini extension install github:Jumpseller/ai
 ```
 
 ## MCP server setup
