@@ -23,11 +23,13 @@ The REST API, MCP server, and CLI all use the **same credentials** — one Login
 
 ### OpenAI Codex
 
-Search for `Jumpseller/ai` in the Codex plugin interface, or run:
+Install the Codex CLI, then wire up the MCP server (see [MCP server setup](#mcp-server-setup) → OpenAI Codex):
 
 ```bash
-codex plugin install github:Jumpseller/ai
+npm install -g @openai/codex   # or: brew install --cask codex
 ```
+
+Codex manages plugins through its interactive `/plugins` browser (run `codex`, then type `/plugins`) and registers marketplace sources with `codex plugin marketplace add`. There is no `codex plugin install <github>` shell command. The most reliable way to get the live Jumpseller tools is the MCP config below.
 
 ### Gemini CLI
 
@@ -59,6 +61,18 @@ Gemini does **not** read `.mcp.json` (that file is Claude-only). The MCP server 
 1. `export` the two env vars **before** starting Gemini (above).
 2. `gemini` → `/extensions install https://github.com/Jumpseller/ai`
 3. Verify the server connected with `/mcp` — you should see `jumpseller` and tools like `get_orders`. No tools listed usually means the env vars weren't set when Gemini launched.
+
+### OpenAI Codex
+
+Codex reads MCP servers from `~/.codex/config.toml` (not `.mcp.json`). Add:
+
+```toml
+[mcp_servers.jumpseller]
+url = "https://mcp.jumpseller.com"
+env_http_headers = { "X-LOGIN-KEY" = "JUMPSELLER_LOGIN_KEY", "X-AUTH-TOKEN" = "JUMPSELLER_AUTH_TOKEN" }
+```
+
+`env_http_headers` maps a header name to an environment variable name; Codex injects the value at runtime. With `JUMPSELLER_LOGIN_KEY` / `JUMPSELLER_AUTH_TOKEN` exported, run `codex` and ask it to use the Jumpseller tools. You can also configure this interactively with `codex mcp add`.
 
 For third-party app developers, use OAuth 2.0 instead. See the [MCP server documentation](https://jumpseller.com/support/mcp-server/) for OAuth setup.
 
