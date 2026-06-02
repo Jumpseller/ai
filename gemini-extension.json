@@ -2,6 +2,29 @@
   "name": "jumpseller",
   "version": "1.0.0",
   "description": "Jumpseller developer tools — REST API, Liquid themes, and MCP server context for Gemini CLI.",
+  "mcpServers": {
+    "jumpseller": {
+      "httpUrl": "https://mcp.jumpseller.com",
+      "headers": {
+        "X-LOGIN-KEY": "${JUMPSELLER_LOGIN_KEY}",
+        "X-AUTH-TOKEN": "${JUMPSELLER_AUTH_TOKEN}"
+      }
+    }
+  },
+  "settings": [
+    {
+      "name": "Jumpseller Login Key",
+      "description": "Login key for the Jumpseller MCP server (Admin Panel → Account Settings → API Tokens).",
+      "envVar": "JUMPSELLER_LOGIN_KEY",
+      "sensitive": true
+    },
+    {
+      "name": "Jumpseller Auth Token",
+      "description": "Auth token for the Jumpseller MCP server (Admin Panel → Account Settings → API Tokens).",
+      "envVar": "JUMPSELLER_AUTH_TOKEN",
+      "sensitive": true
+    }
+  ],
   "skills": [
     {
       "name": "jumpseller-api",
