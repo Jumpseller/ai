@@ -6,6 +6,16 @@
 GET https://api.jumpseller.com/v1/orders.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN&page=1&limit=50
 ```
 
+**Ordering (verified):** orders are returned sorted by **`id` descending — newest first**. This is by id, not by `created_at` (abandoned carts can have out-of-order dates). So **the most recent N orders are simply `page=1&limit=N`** — do not compute the last page from `orders/count.json`. Page 1 is the newest; higher pages are older.
+
+```bash
+# The last 10 orders (most recent)
+curl -u YOUR_LOGIN_KEY:YOUR_AUTH_TOKEN \
+  "https://api.jumpseller.com/v1/orders.json?limit=10&page=1"
+```
+
+Note: `orders/count.json` counts all orders including abandoned carts, so the total can be much larger than the highest order `id`.
+
 ## List orders by status
 
 Valid status enums: `pending_payment`, `paid`, `canceled`, `abandoned`
@@ -101,30 +111,30 @@ GET https://api.jumpseller.com/v1/orders/count.json?login=YOUR_LOGIN_KEY&authtok
 
 **Response:** `{ "count": 128 }`
 
-## Update order — add tracking info
+## Update an order (status only — NOT tracking)
 
+`PUT /orders/{id}.json` accepts **only** these fields (verified — sending anything else returns `400 "No se encontraron parámetros permitidos"`):
+
+| Field | Notes |
+|---|---|
+| `status` | e.g. `"Paid"`, `"Canceled"` (capitalized) |
+| `shipment_status` | order-level shipment state |
+| `additional_information` | free text |
+| `additional_fields` | custom fields |
+
+**Tracking is NOT an order field — you cannot PUT `tracking_number` on an order.** Tracking lives on a separate **Fulfillment** resource. See `examples/fulfillments.md`.
+
+```bash
+# Mark an order as paid (verified)
+curl -u YOUR_LOGIN_KEY:YOUR_AUTH_TOKEN \
+  -X PUT https://api.jumpseller.com/v1/orders/5001.json \
+  -H "Content-Type: application/json" \
+  -d '{"order":{"status":"Paid"}}'
 ```
-PUT https://api.jumpseller.com/v1/orders/5001.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
-Content-Type: application/json
 
-{
-  "order": {
-    "tracking_number": "1Z999AA10123456784",
-    "tracking_company": "UPS",
-    "tracking_url": "https://www.ups.com/track?tracknum=1Z999AA10123456784"
-  }
-}
-```
+## Ship an order with a tracking number
 
-## Mark order as paid
+This is a two-step flow (verified against a live store):
 
-```
-PUT https://api.jumpseller.com/v1/orders/5001.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
-Content-Type: application/json
-
-{
-  "order": {
-    "status": "paid"
-  }
-}
-```
+1. Ensure the order is `Paid` (above).
+2. Create a fulfillment with the tracking info — see **`examples/fulfillments.md`**. Once the fulfillment exists, the order's read-only `tracking_number`, `tracking_company`, `tracking_url`, `fulfillment_status: "fulfilled"`, and `shipment_status_enum: "fulfilled"` are populated **from** the fulfillment.

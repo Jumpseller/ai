@@ -121,10 +121,11 @@ Key product fields: `name`, `description`, `price`, `compare_at_price`, `cost_pe
 |---|---|---|
 | `GET` | `/orders.json` | List all orders |
 | `GET` | `/orders/{id}.json` | Get an order |
-| `PUT` | `/orders/{id}.json` | Update order status or tracking |
+| `PUT` | `/orders/{id}.json` | Update order — **`status`, `shipment_status`, `additional_information`, `additional_fields` only** (NOT tracking) |
 | `GET` | `/orders/count.json` | Count all orders |
 | `GET` | `/orders/status/{status_enum}.json` | List orders by status |
 | `GET` | `/orders/search.json` | Search/filter orders (supports `fulfillment_filters`, `status_filters[]`, `dateFilter` params) |
+| `GET` | `/order/{id}/fulfillments.json` | List an order's fulfillments (note singular `/order/`) |
 
 **Valid order status enums:**
 
@@ -138,6 +139,24 @@ Key product fields: `name`, `description`, `price`, `compare_at_price`, `cost_pe
 Order status (`status_enum`) tracks payment state. Shipment state is tracked separately via `shipment_status_enum` (e.g. `unfulfilled`, `fulfilled`).
 
 Key order fields: `id`, `status`, `status_name`, `status_enum`, `currency`, `subtotal`, `tax`, `shipping`, `total`, `discount`, `fulfillment_status`, `shipment_status_enum`, `tracking_number`, `tracking_company`, `tracking_url`, `customer`, `shipping_address`, `billing_address`, `products`, `source`.
+
+**Tracking is read-only on the order.** `tracking_number`, `tracking_company`, and `tracking_url` appear when you read an order, but they are populated *from* a Fulfillment — you cannot set them via `PUT /orders/{id}.json`. To add tracking you create a fulfillment. See the **Fulfillments** section below and `examples/fulfillments.md`.
+
+### Fulfillments (shipping & tracking)
+
+Fulfillments are a separate resource that carries shipping/tracking. Creating one is how you "ship" an order.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/fulfillments.json` | List fulfillments |
+| `POST` | `/fulfillments.json` | Create a fulfillment (adds tracking to an order) |
+| `GET` | `/fulfillments/count.json` | Count fulfillments |
+| `POST` | `/fulfillments/rates.json` | Get shipping rates |
+| `GET` | `/fulfillments/{id}.json` | Get a fulfillment |
+| `PUT` | `/fulfillments/{id}.json` | Modify a fulfillment |
+| `GET` | `/fulfillments/{id}/label.json` | Shipping label (link valid ~24h) |
+
+Create requires `type` (`manual`, `chilexpress`, `shipit`, `dhl`, `ctt`, `dpd`, `mrw`, `correos_chile`, `servientrega`, `starken`, `bluexpress`, `correos_express`) and `location_id`; pass `order_id` to attach it. Fulfillment-level `shipment_status` enum: `requested`, `in_transit`, `delivered`, `failed`. Full verified flow and field reference in `examples/fulfillments.md`.
 
 ### Customers
 

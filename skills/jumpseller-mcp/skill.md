@@ -58,7 +58,7 @@ Available OAuth scopes: `products`, `orders`, `customers`, `categories`, `pages`
 |---|---|
 | `get_orders` | List orders with optional `status_enum` filter (`pending_payment`, `paid`, `canceled`, `abandoned`) |
 | `get_order` | Get a single order by ID with full line items, addresses, and shipping |
-| `update_order` | Update order status or add `tracking_number`, `tracking_company`, `tracking_url` |
+| `update_order` | Update order `status` (e.g. mark `Paid`) and order-level fields. **Tracking is not an order field** — at the REST level tracking requires creating a Fulfillment (see `jumpseller-api` → Fulfillments). Confirm whether your MCP build exposes a separate fulfillment tool before relying on `update_order` for tracking. |
 
 ### Customers (2 tools)
 
@@ -94,7 +94,7 @@ Available OAuth scopes: `products`, `orders`, `customers`, `categories`, `pages`
 
 1. `get_orders` with `status_enum: "paid"` — find orders ready to fulfill.
 2. `get_order` with the specific ID — confirm line items and shipping address.
-3. `update_order` with `tracking_number`, `tracking_company`, and `tracking_url`.
+3. Create a **fulfillment** for the order with `type`, `location_id`, and the tracking fields (`tracking_number`, `tracking_company`, `tracking_url`). Tracking is carried by the fulfillment, not the order — see `jumpseller-api` → Fulfillments and `examples/fulfillments.md` for the verified REST flow.
 
 ### Bulk price adjustment
 
