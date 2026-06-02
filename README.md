@@ -39,7 +39,7 @@ You'll be asked to trust the workspace and confirm the third-party extension. Th
 
 ## MCP server setup
 
-The toolkit includes a pre-configured `.mcp.json` pointing to `https://mcp.jumpseller.com`. To activate it, set your store credentials as environment variables:
+The MCP server lives at `https://mcp.jumpseller.com`. It authenticates with your store credentials sent as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, which every client reads from environment variables. **Export these before launching your client** — if the client starts without them, the MCP server can't authenticate and its tools never load (the assistant will silently fall back to the REST API or shell instead):
 
 ```bash
 export JUMPSELLER_LOGIN_KEY=your-login-key
@@ -47,6 +47,18 @@ export JUMPSELLER_AUTH_TOKEN=your-auth-token
 ```
 
 Retrieve these from **Admin Panel → Account Settings → API Tokens**.
+
+### Claude Code
+
+The toolkit ships a pre-configured `.mcp.json` pointing at the server. Claude Code reads it automatically — approve the server when prompted, then the MCP tools are available.
+
+### Gemini CLI
+
+Gemini does **not** read `.mcp.json` (that file is Claude-only). The MCP server is declared in the extension's `gemini-extension.json`, so installing the extension wires it up. Steps:
+
+1. `export` the two env vars **before** starting Gemini (above).
+2. `gemini` → `/extensions install https://github.com/Jumpseller/ai`
+3. Verify the server connected with `/mcp` — you should see `jumpseller` and tools like `get_orders`. No tools listed usually means the env vars weren't set when Gemini launched.
 
 For third-party app developers, use OAuth 2.0 instead. See the [MCP server documentation](https://jumpseller.com/support/mcp-server/) for OAuth setup.
 

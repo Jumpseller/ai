@@ -115,7 +115,9 @@ Available OAuth scopes: `products`, `orders`, `customers`, `categories`, `pages`
 
 ## Connection Setup
 
-The `.mcp.json` in this toolkit pre-configures the connection:
+The server is `https://mcp.jumpseller.com`, authenticated with `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers read from the `JUMPSELLER_LOGIN_KEY` / `JUMPSELLER_AUTH_TOKEN` environment variables. **These env vars must be set before the client launches** — otherwise the server can't authenticate and exposes no tools.
+
+**Claude Code** — reads the toolkit's `.mcp.json` automatically:
 
 ```json
 {
@@ -132,4 +134,15 @@ The `.mcp.json` in this toolkit pre-configures the connection:
 }
 ```
 
-Set `JUMPSELLER_LOGIN_KEY` and `JUMPSELLER_AUTH_TOKEN` as environment variables before starting your AI tool. The credentials are never committed to the repo.
+**Gemini CLI** — does NOT read `.mcp.json`. The server is declared in the extension's `gemini-extension.json` (`mcpServers` with `httpUrl`); installing the extension wires it up. Export the env vars before running `gemini`, then verify with `/mcp`.
+
+Credentials are never committed to the repo — only env-var references.
+
+## If the MCP tools are not available
+
+If you (the assistant) were asked to use the MCP but the `get_*`/`create_*`/`update_*` tools are not in your toolset, **do not silently fall back to the REST API or shell.** The MCP simply isn't connected. Tell the user, and point them to the fix:
+
+1. The MCP server config must be loaded by the client (Claude reads `.mcp.json`; Gemini needs the extension installed).
+2. `JUMPSELLER_LOGIN_KEY` and `JUMPSELLER_AUTH_TOKEN` must be set **before the client started**.
+
+Only after confirming with the user should you use the REST API (`jumpseller-api` skill) as an alternative — and say explicitly that you are doing so instead of the MCP.
