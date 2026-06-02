@@ -17,6 +17,11 @@
       "name": "jumpseller-mcp",
       "description": "Use when managing a Jumpseller store through MCP tools or conversational store operations.",
       "path": "skills/jumpseller-mcp/skill.md"
+    },
+    {
+      "name": "jumpseller-cli",
+      "description": "Use when using the Jumpseller CLI to manage store credentials or do local theme development — export, import, watch, apply, list, rename, or delete themes.",
+      "path": "skills/jumpseller-cli/skill.md"
     }
   ]
 }

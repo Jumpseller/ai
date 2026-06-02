@@ -7,9 +7,10 @@ AI context for building Jumpseller themes and integrations. Install once and you
 - **`jumpseller-api` skill** — REST API reference: authentication, all resources, pagination, rate limits, and verified code examples.
 - **`jumpseller-liquid` skill** — Liquid templating reference: global objects, filters, theme file structure, and the component settings system.
 - **`jumpseller-mcp` skill** — MCP server reference: all 20 tools, authentication setup, and common multi-step patterns.
+- **`jumpseller-cli` skill** — CLI reference: credential management, store resolution, and local theme development (export, import, watch, apply).
 - **Pre-configured `.mcp.json`** — connects directly to `https://mcp.jumpseller.com`.
 
-For **local theme development**, see the separate [Jumpseller CLI](https://github.com/Jumpseller/jumpseller-cli) (`npm i -g @jumpseller/cli`) — the official tool for syncing themes between your machine and a store.
+The REST API, MCP server, and CLI all use the **same credentials** — one Login key + Auth Token pair per store, from **Admin Panel → Account Settings → API Tokens**. The separate [Jumpseller CLI](https://github.com/Jumpseller/jumpseller-cli) (`npm i -g @jumpseller/cli`) is the official tool for syncing themes between your machine and a store.
 
 ## Installation
 

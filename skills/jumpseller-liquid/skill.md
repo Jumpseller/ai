@@ -35,7 +35,7 @@ jumpseller access          # set up store credentials
 jumpseller theme --help    # local theme development commands
 ```
 
-For exact command syntax and options, refer to the `jumpseller-cli` repository and its `--help` output — it is still in early development, so treat its README as the source of truth rather than assuming command names.
+For full command reference — `access` (credentials), `theme export`/`import`/`watch`/`apply`, store resolution, and config file locations — see the **`jumpseller-cli` skill**. The CLI uses the same Login key + Auth Token as the REST API and MCP server.
 
 ## Global Liquid Objects
 

@@ -28,6 +28,8 @@ For third-party apps, use OAuth 2.0 — see https://jumpseller.com/support/oauth
 
 Retrieve credentials from: **Admin Panel → Account Settings → API Tokens**.
 
+The same Login key + Auth Token pair is used by all Jumpseller interfaces — the REST API (Basic auth), the MCP server (`X-LOGIN-KEY`/`X-AUTH-TOKEN` headers), and the `jumpseller-cli` (stored in `~/.config/jumpseller/credentials`). You do not generate separate credentials per interface.
+
 ## URL Format
 
 All endpoints require a `.json` extension:

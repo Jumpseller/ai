@@ -20,6 +20,8 @@ A live MCP (Model Context Protocol) server at `https://mcp.jumpseller.com` that 
 
 Retrieve from **Admin Panel → Account Settings → API Tokens**.
 
+This is the **same Login key + Auth Token** used by the REST API (`jumpseller-api`) and the CLI (`jumpseller-cli`) — one credential pair per store, used across all three interfaces.
+
 Set as environment variables — the `.mcp.json` reads them automatically:
 
 ```bash
