@@ -32,8 +32,10 @@ codex plugin install github:Jumpseller/ai
 ### Gemini CLI
 
 ```bash
-gemini extension install github:Jumpseller/ai
+gemini extensions install https://github.com/Jumpseller/ai
 ```
+
+You'll be asked to trust the workspace and confirm the third-party extension. Then run `gemini` and the skills load automatically. Verify with `gemini extensions list`.
 
 ## MCP server setup
 
