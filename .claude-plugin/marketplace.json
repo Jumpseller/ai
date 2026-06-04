@@ -1,0 +1,21 @@
+{
+  "name": "ai",
+  "owner": {
+    "name": "Jumpseller"
+  },
+  "metadata": {
+    "description": "Jumpseller developer tools for AI coding assistants"
+  },
+  "plugins": [
+    {
+      "name": "jumpseller-plugin",
+      "source": "./",
+      "description": "Jumpseller developer tools — REST API, Liquid themes, MCP server, and CLI context for AI assistants.",
+      "version": "1.0.0",
+      "author": { "name": "Jumpseller" },
+      "license": "MIT",
+      "homepage": "https://github.com/Jumpseller/ai",
+      "keywords": ["jumpseller", "liquid", "rest-api", "mcp", "cli", "ecommerce", "theme"]
+    }
+  ]
+}
