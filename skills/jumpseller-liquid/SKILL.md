@@ -1,3 +1,7 @@
+---
+name: jumpseller-liquid
+description: "Use when building or editing Jumpseller themes, Liquid templates, partials, or theme components."
+---
 # Jumpseller Liquid Theming
 
 Use this skill when building or editing Jumpseller themes using the Liquid templating language.

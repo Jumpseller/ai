@@ -1,3 +1,7 @@
+---
+name: jumpseller-cli
+description: "Use when using the Jumpseller CLI to manage store credentials or do local theme development (export, import, watch, apply, list, rename, delete themes)."
+---
 # Jumpseller CLI
 
 Use this skill when using the **Jumpseller CLI** (`jumpseller`) — the official command-line tool for managing store credentials and doing local theme development against a Jumpseller store.

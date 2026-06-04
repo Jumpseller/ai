@@ -1,3 +1,7 @@
+---
+name: jumpseller-api
+description: "Use when working with the Jumpseller REST API to manage products, orders, customers, categories, pages, webhooks, or any store resource."
+---
 # Jumpseller REST API
 
 Use this skill when integrating with the Jumpseller REST API to manage store data programmatically.

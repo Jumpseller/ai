@@ -1,3 +1,7 @@
+---
+name: jumpseller-mcp
+description: "Use when managing a Jumpseller store through MCP tools or conversational store operations."
+---
 # Jumpseller MCP Server
 
 Use this skill when managing a Jumpseller store through the MCP server tools, or when setting up the MCP connection.
