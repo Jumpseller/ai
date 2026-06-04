@@ -34,6 +34,8 @@ Retrieve credentials from: **Admin Panel → Account Settings → API Tokens**.
 
 The same Login key + Auth Token pair is used by all Jumpseller interfaces — the REST API (Basic auth), the MCP server (`X-LOGIN-KEY`/`X-AUTH-TOKEN` headers), and the `jumpseller-cli` (stored in `~/.config/jumpseller/credentials`). You do not generate separate credentials per interface.
 
+> ⚠️ **These credentials are full-access — never expose them in client-side or public code.** Do not embed the Login key / Auth Token (or a Basic-auth string) in theme files, HTML, `<script>` tags, assets, or browser `fetch` calls. A leaked key gives anyone full read/write over the store. Use the API only **server-side or at build time**; for storefront/theme features, render data with server-side Liquid objects instead (see `jumpseller-liquid`).
+
 ## URL Format
 
 All endpoints require a `.json` extension:

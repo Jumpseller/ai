@@ -6,6 +6,14 @@ description: "Use when building or editing Jumpseller themes, Liquid templates, 
 
 Use this skill when building or editing Jumpseller themes using the Liquid templating language.
 
+## ⚠️ Security: never put API credentials in theme code
+
+Theme files (Liquid, HTML, CSS, JS, assets) are **served publicly to every visitor**. **Never** embed credentials in them:
+
+- Do NOT hardcode `JUMPSELLER_LOGIN_KEY`, `JUMPSELLER_AUTH_TOKEN`, a Basic-auth string, or any API/MCP token into Liquid, `<script>` tags, asset files, or client-side `fetch`/`XMLHttpRequest` calls. These credentials are **full-access** — a single leaked key lets anyone read every customer and order and modify the entire store.
+- Liquid renders **server-side**, so storefront features get store data from Liquid objects (`order`, `product`, `cart`, `customer`, etc.) **without any credentials**. Use those.
+- Need data not available in Liquid (e.g. recent orders for a "social proof / FOMO" widget)? Fetch it **server-side or at build time** with the API/CLI, then inject only the **non-sensitive, anonymized** result into the theme as static content (e.g. "Someone in Santiago just bought X") — never the credentials, and never raw customer PII (full name, email, phone, address).
+
 ## What is Liquid
 
 Liquid is the templating language used in Jumpseller themes. It has three types of delimiters:

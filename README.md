@@ -50,6 +50,8 @@ export JUMPSELLER_AUTH_TOKEN=your-auth-token
 
 Retrieve these from **Admin Panel → Account Settings → API Tokens**.
 
+> ⚠️ **These credentials are full-access — keep them server-side.** Never embed the Login key / Auth Token in theme code, HTML, client-side JavaScript, or any public storefront output. A leaked key gives anyone full read/write over the store. For storefront features, render data with server-side Liquid objects instead of client-side API calls.
+
 ### Claude Code
 
 The toolkit ships a pre-configured `.mcp.json` pointing at the server. Claude Code reads it automatically — approve the server when prompted, then the MCP tools are available.

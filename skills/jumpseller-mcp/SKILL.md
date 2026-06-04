@@ -160,6 +160,8 @@ The server is `https://mcp.jumpseller.com`, authenticated with `X-LOGIN-KEY` / `
 
 Credentials are never committed to the repo — only env-var references.
 
+> ⚠️ **These credentials are full-access.** They belong in the client's MCP config / environment only — **never** in generated theme code, HTML, client-side JS, or any public/storefront output. See `jumpseller-liquid` → Security.
+
 ## Known limitation: Gemini CLI rejects list/search results
 
 Gemini CLI validates every tool result's `structuredContent` as a JSON **object** and crashes when a tool's payload is a top-level JSON **array**, with:
