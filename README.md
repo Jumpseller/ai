@@ -6,7 +6,7 @@ AI context for building Jumpseller themes and integrations. Install once and you
 
 - **`jumpseller-api` skill** — REST API reference: authentication, all resources, pagination, rate limits, and verified code examples.
 - **`jumpseller-liquid` skill** — Liquid templating reference: global objects, filters, theme file structure, and the component settings system.
-- **`jumpseller-mcp` skill** — MCP server reference: all 20 tools, authentication setup, and common multi-step patterns.
+- **`jumpseller-mcp` skill** — MCP server reference: all 24 tools, authentication setup, and common multi-step patterns.
 - **`jumpseller-cli` skill** — CLI reference: credential management, store resolution, and local theme development (export, import, watch, apply).
 - **Pre-configured `.mcp.json`** — connects directly to `https://mcp.jumpseller.com`.
 
@@ -62,7 +62,9 @@ Gemini does **not** read `.mcp.json` (that file is Claude-only). The MCP server 
 
 1. `export` the two env vars **before** starting Gemini (above).
 2. `gemini` → `/extensions install https://github.com/Jumpseller/ai`
-3. Verify the server connected with `/mcp` — you should see `jumpseller` and tools like `get_orders`. No tools listed usually means the env vars weren't set when Gemini launched.
+3. Verify the server connected with `/mcp` — you should see `jumpseller` and tools like `list_orders`. No tools listed usually means the env vars weren't set when Gemini launched.
+
+> ⚠️ **Known Gemini CLI limitation:** the list/search tools (`list_orders`, `list_products`, `list_categories`, `list_customers`, `search_*`) currently fail in Gemini CLI with `Invalid input: expected record, received array (path: structuredContent)`. This is a Gemini CLI client-side validation bug ([gemini-cli#15375](https://github.com/google-gemini/gemini-cli/issues/15375)), **not** a server issue — the same tools work in Claude clients. Until it's fixed upstream, use the REST API for listing/searching; the single-resource tools (`get_product`, `get_order`, …) and all writes are unaffected.
 
 ### OpenAI Codex
 
