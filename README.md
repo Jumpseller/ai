@@ -16,10 +16,23 @@ The REST API, MCP server, and CLI all use the **same credentials** — one Login
 
 ### Claude Code
 
+Claude Code supports installing plugins directly from GitHub repos. Two commands and you're done.
+
+> **Prerequisite:** run these in the **Claude Code CLI** (`claude` in your terminal, or the desktop app). They do not work in the claude.ai web interface.
+
+**Step 1 — register the GitHub repo as a plugin source** (once per machine):
+
 ```
 /plugin marketplace add Jumpseller/ai
+```
+
+**Step 2 — install the plugin from that source:**
+
+```
 /plugin install jumpseller-plugin@ai
 ```
+
+`@ai` is the marketplace alias from step 1 (the repo name), not a version number. After both steps, open a new session and the `jumpseller-api`, `jumpseller-liquid`, `jumpseller-mcp`, and `jumpseller-cli` skills load automatically.
 
 ### OpenAI Codex
 

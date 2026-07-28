@@ -1,21 +1,21 @@
-# Collection (Category) Page — Liquid Example
+# Category Page — Liquid Example
 
 **File:** `templates/category.liquid`
 
 ```liquid
-<div class="collection-page">
+<div class="category-page">
 
-  <header class="collection-header">
-    <h1>{{ collection.name }}</h1>
-    {% if collection.description %}
-      <p class="collection-description">{{ collection.description }}</p>
+  <header class="category-header">
+    <h1>{{ category.name }}</h1>
+    {% if category.description %}
+      <p class="category-description">{{ category.description }}</p>
     {% endif %}
   </header>
 
-  {% if collection.products.size > 0 %}
+  {% if category.products.size > 0 %}
 
     <div class="product-grid">
-      {% for product in collection.products %}
+      {% for product in category.products %}
         <div class="product-card">
           <a href="{{ product.url }}">
 
@@ -49,20 +49,20 @@
       {% endfor %}
     </div>
 
-    {% if collection.total_pages > 1 %}
-      <nav class="pagination" aria-label="Collection pagination">
-        {% if collection.current_page > 1 %}
-          <a href="?page={{ collection.current_page | minus: 1 }}" class="pagination-prev">
+    {% if paged.total_pages > 1 %}
+      <nav class="pagination" aria-label="Category pagination">
+        {% if paged.current_page > 1 %}
+          <a href="?page={{ paged.current_page | minus: 1 }}" class="pagination-prev">
             &larr; {{ 'pagination.prev' | t }}
           </a>
         {% endif %}
 
         <span class="pagination-info">
-          {{ collection.current_page }} / {{ collection.total_pages }}
+          {{ paged.current_page }} / {{ paged.total_pages }}
         </span>
 
-        {% if collection.current_page < collection.total_pages %}
-          <a href="?page={{ collection.current_page | plus: 1 }}" class="pagination-next">
+        {% if paged.current_page < paged.total_pages %}
+          <a href="?page={{ paged.current_page | plus: 1 }}" class="pagination-next">
             {{ 'pagination.next' | t }} &rarr;
           </a>
         {% endif %}
@@ -70,7 +70,7 @@
     {% endif %}
 
   {% else %}
-    <p class="collection-empty">{{ 'collection.no_products' | t }}</p>
+    <p class="category-empty">{{ 'category.no_products' | t }}</p>
   {% endif %}
 
 </div>
