@@ -96,6 +96,17 @@ On `429`, check the headers and wait until the reset time before retrying.
 
 Optional `fields` query param: comma-separated list of fields to return. Allowed values: `name`, `code`, `currency`, `country`, `timezone`, `email`, `hooks_token`, `url`, `subscription_plan`, `logo`, `weight_unit`, `fb_pixel_id`, `whatsapp_phone`, `mobile_app_version`, `subscription_status`, `checkout_version`, `address`.
 
+### Countries, regions & municipalities (geo lookup)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/countries.json` | List all countries (`{code, name}`) |
+| `GET` | `/countries/{country_code}.json` | Single country |
+| `GET` | `/countries/{country_code}/regions.json` | Regions for a country (`{code, name, iso}`) |
+| `GET` | `/countries/{country_code}/regions/{region_code}/municipalities.json` | Municipalities for a region (`{code, name}`) |
+
+Use this to resolve the `region`/`municipality` codes that show up in addresses, `locations[]` (shipping method `tables`), etc. into human-readable names — e.g. confirming that for Chile (`CL`), region `01` is Valparaíso (`iso: "VS"`) and region `12` is Región Metropolitana (`iso: "RM"`), or turning a `municipality` code like `8261428` into `"Las Condes"`. Region/municipality codes are **not** the standard INE numbering — verify against these endpoints rather than assuming a mapping.
+
 ### Products
 
 | Method | Endpoint | Description |
