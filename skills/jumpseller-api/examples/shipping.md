@@ -43,6 +43,45 @@ GET https://api.jumpseller.com/v1/shipping_methods.json?login=YOUR_LOGIN_KEY&aut
 
 The `services` array lists the specific service options available for carrier-based shipping methods (e.g. Starken, Blue Express). For custom/flat-rate methods, `services` is empty and `fee` is the flat charge.
 
+## Create a "tables" shipping method (rate table by weight/location)
+
+```
+POST https://api.jumpseller.com/v1/shipping_methods.json?login=YOUR_LOGIN_KEY&authtoken=YOUR_AUTH_TOKEN
+Content-Type: application/json
+```
+
+```json
+{
+  "shipping_method": {
+    "type": "tables",
+    "name": "Tarifario CL",
+    "enabled": false,
+    "tables": [
+      {
+        "basedon": "weight",
+        "values": [
+          { "amount": 0,   "price": 3990 },
+          { "amount": 2,   "price": 4990 },
+          { "amount": 9,   "price": 6990 },
+          { "amount": 20,  "price": 8990 },
+          { "amount": 45,  "price": 11990 },
+          { "amount": 100, "price": 11990 }
+        ],
+        "locations": [
+          { "country": "CL", "region": "13", "municipality": "13101" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+- One `tables[]` entry = one rate table for one `locations[]` zone (e.g. one row of a rate sheet). A shipping method can carry many tables, one per zone.
+- `values[]` is a list of **breakpoints**, not buckets: `{amount, price}` means "starting at this weight, this price applies until the next breakpoint." If your source data is organized as columns that are range *ceilings* (e.g. a column named `2` meaning "price for 0–2kg", a column `9` meaning "price for 2–9kg"), you must shift it: prepend `{amount: 0, price: <price of the first column>}`, then pair each subsequent column's price with the *previous* column's weight as the `amount`, and finally repeat the last column's price at `amount: <last weight>` as the "or heavier" catch-all. Getting this backwards produces a table that looks valid but charges the wrong bracket's price.
+- `region` in `locations[]` is Chile's 2-digit region code as a zero-padded **string** (`"02"`, not `"2"`).
+- Creating with `enabled: false` and enabling only after checking the table in the admin is a reasonable safety practice — a bad range-shift silently produces wrong live pricing rather than an error.
+- Whether `PUT /shipping_methods/{id}.json` can update `tables[]` in place (vs. needing to recreate the shipping method), and whether `basedon` supports values besides `"weight"`, haven't been verified against the live API — confirm before relying on either.
+
 ## Payment Methods
 
 ```
