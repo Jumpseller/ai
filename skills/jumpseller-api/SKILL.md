@@ -266,8 +266,11 @@ Promotion fields: `id`, `name`, `discount_target`, `discount_amount_fix`, `disco
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/shipping_methods.json` | List configured shipping methods |
+| `POST` | `/shipping_methods.json` | Create a shipping method (e.g. a `tables` rate table) |
 
 Shipping method fields: `id`, `type`, `name`, `enabled`, `free_shipping`, `free_shipping_minimum_purchase`, `fee`, `services` (array of `{id, name, service_code}`).
+
+The `tables` type is a per-location rate table (e.g. price by weight bracket): `tables[]`, each with `basedon` (e.g. `"weight"`), `values[]` (`{amount, price}` breakpoints), and `locations[]` (`{country, region, municipality}`). See `examples/shipping.md` for the full payload and a gotcha around converting sheet-style "range ceiling" columns into Jumpseller's breakpoint format.
 
 ### Payment Methods
 
