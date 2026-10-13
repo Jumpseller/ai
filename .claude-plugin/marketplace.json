@@ -10,8 +10,8 @@
     {
       "name": "jumpseller-plugin",
       "source": "./",
-      "description": "Jumpseller developer tools — REST API, Liquid themes, MCP server, and CLI context for AI assistants.",
-      "version": "1.0.0",
+      "description": "Run your Jumpseller store from Claude: manage products, orders, customers, categories and pages through the Jumpseller MCP server, and build themes and integrations with REST API, Liquid and CLI references.",
+      "version": "1.1.0",
       "author": { "name": "Jumpseller" },
       "license": "MIT",
       "homepage": "https://github.com/Jumpseller/ai",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2026-10-13
+
+### Changed
+- The MCP server connects with OAuth: Claude clients sign in with the user's Jumpseller account instead of reading `JUMPSELLER_LOGIN_KEY` / `JUMPSELLER_AUTH_TOKEN`. API token headers are still documented for CI and scripts, and the Gemini extension keeps using them.
+- `jumpseller-mcp` skill: OAuth first, real scope names.
+- Plugin description covers store management, not only development.
+
 ## [1.0.0] - 2026-05-29
 
 ### Added
