@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Codex signs in with OAuth (`codex mcp login jumpseller`); API token headers stay documented for CI.
+
 ## [1.1.0] - 2026-10-13
 
 ### Changed

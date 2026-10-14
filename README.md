@@ -56,7 +56,7 @@ You'll be asked to trust the workspace and confirm the third-party extension. Th
 
 The MCP server lives at `https://mcp.jumpseller.com`. Claude clients connect with OAuth: you sign in with your own Jumpseller account, so your role's permissions apply to every tool call.
 
-Clients that don't sign in with OAuth (Gemini CLI, Codex below, scripts and CI) send your store credentials as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, read from environment variables. **Export these before launching the client** — if it starts without them, the MCP server can't authenticate and its tools never load:
+Clients that don't sign in with OAuth (Gemini CLI, scripts and CI) send your store credentials as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, read from environment variables. **Export these before launching the client** — if it starts without them, the MCP server can't authenticate and its tools never load:
 
 ```bash
 export JUMPSELLER_LOGIN_KEY=your-login-key
@@ -95,10 +95,15 @@ Codex reads MCP servers from `~/.codex/config.toml` (not `.mcp.json`). Add:
 ```toml
 [mcp_servers.jumpseller]
 url = "https://mcp.jumpseller.com"
-env_http_headers = { "X-LOGIN-KEY" = "JUMPSELLER_LOGIN_KEY", "X-AUTH-TOKEN" = "JUMPSELLER_AUTH_TOKEN" }
 ```
 
-`env_http_headers` maps a header name to an environment variable name; Codex injects the value at runtime. With `JUMPSELLER_LOGIN_KEY` / `JUMPSELLER_AUTH_TOKEN` exported, run `codex` and ask it to use the Jumpseller tools. You can also configure this interactively with `codex mcp add`.
+Then sign in: run `codex mcp login jumpseller`, and a browser window opens where you sign in to Jumpseller, pick the store and approve access. No environment variables are needed. Run `codex` and ask it to use the Jumpseller tools.
+
+To use API token headers instead (CI, headless runs), add them to the same block; `env_http_headers` maps a header name to an environment variable that Codex reads at runtime:
+
+```toml
+env_http_headers = { "X-LOGIN-KEY" = "JUMPSELLER_LOGIN_KEY", "X-AUTH-TOKEN" = "JUMPSELLER_AUTH_TOKEN" }
+```
 
 For third-party app developers, register an app and use OAuth 2.0. See the [MCP server documentation](https://jumpseller.com/support/mcp-server/) for OAuth setup.
 
