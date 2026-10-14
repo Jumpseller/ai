@@ -8,9 +8,9 @@ AI context for building Jumpseller themes and integrations. Install once and you
 - **`jumpseller-liquid` skill** — Liquid templating reference: global objects, filters, theme file structure, and the component settings system.
 - **`jumpseller-mcp` skill** — MCP server reference: all 24 tools, authentication setup, and common multi-step patterns.
 - **`jumpseller-cli` skill** — CLI reference: credential management, store resolution, and local theme development (export, import, watch, apply).
-- **Pre-configured `.mcp.json`** — connects directly to `https://mcp.jumpseller.com`.
+- **Pre-configured `.mcp.json`** — connects to `https://mcp.jumpseller.com`; you sign in with your Jumpseller account (OAuth), no keys to copy.
 
-The REST API, MCP server, and CLI all use the **same credentials** — one Login key + Auth Token pair per store, from **Admin Panel → Account Settings → API Tokens**. The separate [Jumpseller CLI](https://github.com/Jumpseller/jumpseller-cli) (`npm i -g @jumpseller/cli`) is the official tool for syncing themes between your machine and a store.
+The REST API and CLI use one Login key + Auth Token pair per store, from **Admin Panel → Account Settings → API Tokens**. The MCP server accepts the same pair as headers for scripts and CI, but in Claude you just sign in. The separate [Jumpseller CLI](https://github.com/Jumpseller/jumpseller-cli) (`npm i -g @jumpseller/cli`) is the official tool for syncing themes between your machine and a store.
 
 ## Installation
 
@@ -32,7 +32,7 @@ Claude Code supports installing plugins directly from GitHub repos. Two commands
 /plugin install jumpseller-plugin@ai
 ```
 
-`@ai` is the marketplace alias from step 1 (the repo name), not a version number. After both steps, open a new session and the `jumpseller-api`, `jumpseller-liquid`, `jumpseller-mcp`, and `jumpseller-cli` skills load automatically.
+`@ai` is the marketplace alias from step 1 (the repo name), not a version number. After both steps, open a new session and the `jumpseller-api`, `jumpseller-liquid`, `jumpseller-mcp`, and `jumpseller-cli` skills load automatically. To connect the store tools, run `/mcp`, pick `jumpseller` and choose **Authenticate**: a browser window opens, you sign in to Jumpseller, pick the store and approve access.
 
 ### OpenAI Codex
 
@@ -54,7 +54,9 @@ You'll be asked to trust the workspace and confirm the third-party extension. Th
 
 ## MCP server setup
 
-The MCP server lives at `https://mcp.jumpseller.com`. It authenticates with your store credentials sent as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, which every client reads from environment variables. **Export these before launching your client** — if the client starts without them, the MCP server can't authenticate and its tools never load (the assistant will silently fall back to the REST API or shell instead):
+The MCP server lives at `https://mcp.jumpseller.com`. Claude clients connect with OAuth: you sign in with your own Jumpseller account, so your role's permissions apply to every tool call.
+
+Clients that don't sign in with OAuth (Gemini CLI, Codex below, scripts and CI) send your store credentials as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, read from environment variables. **Export these before launching the client** — if it starts without them, the MCP server can't authenticate and its tools never load:
 
 ```bash
 export JUMPSELLER_LOGIN_KEY=your-login-key
@@ -67,7 +69,14 @@ Retrieve these from **Admin Panel → Account Settings → API Tokens**.
 
 ### Claude Code
 
-The toolkit ships a pre-configured `.mcp.json` pointing at the server. Claude Code reads it automatically — approve the server when prompted, then the MCP tools are available.
+The toolkit ships a pre-configured `.mcp.json` pointing at the server. Claude Code reads it automatically — approve the server when prompted, then run `/mcp` → `jumpseller` → **Authenticate** and sign in. No environment variables are needed.
+
+To use API token headers instead (CI, headless runs), add the server yourself:
+
+```bash
+claude mcp add --transport http jumpseller https://mcp.jumpseller.com \
+  --header "X-LOGIN-KEY: $JUMPSELLER_LOGIN_KEY" --header "X-AUTH-TOKEN: $JUMPSELLER_AUTH_TOKEN"
+```
 
 ### Gemini CLI
 
@@ -91,7 +100,7 @@ env_http_headers = { "X-LOGIN-KEY" = "JUMPSELLER_LOGIN_KEY", "X-AUTH-TOKEN" = "J
 
 `env_http_headers` maps a header name to an environment variable name; Codex injects the value at runtime. With `JUMPSELLER_LOGIN_KEY` / `JUMPSELLER_AUTH_TOKEN` exported, run `codex` and ask it to use the Jumpseller tools. You can also configure this interactively with `codex mcp add`.
 
-For third-party app developers, use OAuth 2.0 instead. See the [MCP server documentation](https://jumpseller.com/support/mcp-server/) for OAuth setup.
+For third-party app developers, register an app and use OAuth 2.0. See the [MCP server documentation](https://jumpseller.com/support/mcp-server/) for OAuth setup.
 
 ## REST API authentication
 

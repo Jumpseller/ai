@@ -1,6 +1,6 @@
 {
   "name": "jumpseller",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Jumpseller developer tools — REST API, Liquid themes, MCP server, and CLI context for Gemini CLI.",
   "mcpServers": {
     "jumpseller": {

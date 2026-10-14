@@ -20,24 +20,17 @@ A live MCP (Model Context Protocol) server at `https://mcp.jumpseller.com` that 
 
 ## Authentication
 
-### API Token (store owners)
+### Sign in with OAuth (default)
 
-Retrieve from **Admin Panel → Account Settings → API Tokens**.
+The plugin's `.mcp.json` has no credentials. On first use the client opens a Jumpseller sign-in page; the user signs in with their own account, picks the store and approves access. The token belongs to that account, so the account's role permissions apply to every tool call and removing the account from the store disconnects it.
 
-This is the **same Login key + Auth Token** used by the REST API (`jumpseller-api`) and the CLI (`jumpseller-cli`) — one credential pair per store, used across all three interfaces.
+MCP clients need no app registration: Claude, Claude Code, ChatGPT and Codex identify themselves with a Client ID Metadata Document, which the server accepts.
 
-Set as environment variables — the `.mcp.json` reads them automatically:
+Scopes: `read_store`, `read_products`, `write_products`, `read_orders`, `write_orders`, `read_customers`, `read_categories`, `write_categories`, `read_pages`, `write_pages`.
 
-```bash
-export JUMPSELLER_LOGIN_KEY=your-login-key
-export JUMPSELLER_AUTH_TOKEN=your-auth-token
-```
+### API token headers (CI and scripts)
 
-### OAuth 2.0 (third-party app developers)
-
-Register your app in the Jumpseller Partner Panel to receive a `client_id` and `client_secret`. Merchants authorize your app via the OAuth flow.
-
-Available OAuth scopes: `products`, `orders`, `customers`, `categories`, `pages`, `store`.
+For non-interactive use, send the store's **Login key + Auth Token** (Admin Panel → Account Settings → API Tokens) as `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers. This is the same pair the REST API (`jumpseller-api`) and the CLI (`jumpseller-cli`) use.
 
 ## Rate Limiting
 
@@ -137,9 +130,22 @@ Available OAuth scopes: `products`, `orders`, `customers`, `categories`, `pages`
 
 ## Connection Setup
 
-The server is `https://mcp.jumpseller.com`, authenticated with `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers read from the `JUMPSELLER_LOGIN_KEY` / `JUMPSELLER_AUTH_TOKEN` environment variables. **These env vars must be set before the client launches** — otherwise the server can't authenticate and exposes no tools.
+The server is `https://mcp.jumpseller.com`.
 
-**Claude Code** — reads the toolkit's `.mcp.json` automatically:
+**Claude Code / Claude Desktop / claude.ai** — the plugin's `.mcp.json` connects with OAuth; approve the server, then sign in when prompted (in Claude Code, `/mcp` → `jumpseller` → Authenticate).
+
+```json
+{
+  "mcpServers": {
+    "jumpseller": {
+      "type": "http",
+      "url": "https://mcp.jumpseller.com"
+    }
+  }
+}
+```
+
+**API token headers instead of OAuth** (CI, scripts): add a server with the headers, reading the values from environment variables set before the client starts:
 
 ```json
 {
@@ -160,7 +166,7 @@ The server is `https://mcp.jumpseller.com`, authenticated with `X-LOGIN-KEY` / `
 
 Credentials are never committed to the repo — only env-var references.
 
-> ⚠️ **These credentials are full-access.** They belong in the client's MCP config / environment only — **never** in generated theme code, HTML, client-side JS, or any public/storefront output. See `jumpseller-liquid` → Security.
+> ⚠️ **API tokens are full-access.** They belong in the client's MCP config / environment only — **never** in generated theme code, HTML, client-side JS, or any public/storefront output. See `jumpseller-liquid` → Security.
 
 ## Known limitation: Gemini CLI rejects list/search results
 
@@ -179,6 +185,6 @@ This affects the list/search tools (`list_products`, `list_orders`, `list_catego
 If you (the assistant) were asked to use the MCP but the `get_*`/`create_*`/`update_*` tools are not in your toolset, **do not silently fall back to the REST API or shell.** The MCP simply isn't connected. Tell the user, and point them to the fix:
 
 1. The MCP server config must be loaded by the client (Claude reads `.mcp.json`; Gemini needs the extension installed).
-2. `JUMPSELLER_LOGIN_KEY` and `JUMPSELLER_AUTH_TOKEN` must be set **before the client started**.
+2. The user must have signed in (Claude Code: `/mcp` → `jumpseller` → Authenticate), or, with header auth, `JUMPSELLER_LOGIN_KEY` and `JUMPSELLER_AUTH_TOKEN` must be set **before the client started**.
 
 Only after confirming with the user should you use the REST API (`jumpseller-api` skill) as an alternative — and say explicitly that you are doing so instead of the MCP.
