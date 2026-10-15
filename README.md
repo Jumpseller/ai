@@ -56,7 +56,7 @@ You'll be asked to trust the workspace and confirm the third-party extension. Th
 
 The MCP server lives at `https://mcp.jumpseller.com`. Claude clients connect with OAuth: you sign in with your own Jumpseller account, so your role's permissions apply to every tool call.
 
-Clients that don't sign in with OAuth (Gemini CLI, scripts and CI) send your store credentials as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, read from environment variables. **Export these before launching the client** — if it starts without them, the MCP server can't authenticate and its tools never load:
+Clients that don't sign in with OAuth (Gemini CLI, Grok CLI, Muse Code, scripts and CI) send your store credentials as the `X-LOGIN-KEY` / `X-AUTH-TOKEN` headers, read from environment variables. **Export these before launching the client** — if it starts without them, the MCP server can't authenticate and its tools never load:
 
 ```bash
 export JUMPSELLER_LOGIN_KEY=your-login-key
@@ -104,6 +104,39 @@ To use API token headers instead (CI, headless runs), add them to the same block
 ```toml
 env_http_headers = { "X-LOGIN-KEY" = "JUMPSELLER_LOGIN_KEY", "X-AUTH-TOKEN" = "JUMPSELLER_AUTH_TOKEN" }
 ```
+
+### Grok CLI
+
+Grok CLI doesn't load the toolkit's skills or `.mcp.json`; add the MCP server yourself. The single quotes keep the variable names in Grok's config, and Grok reads the two env vars (above) each time it starts:
+
+```bash
+grok mcp add --transport http jumpseller https://mcp.jumpseller.com \
+  --header 'X-LOGIN-KEY: ${JUMPSELLER_LOGIN_KEY}' \
+  --header 'X-AUTH-TOKEN: ${JUMPSELLER_AUTH_TOKEN}'
+```
+
+Verify with `/mcps` in Grok: you should see `jumpseller` connected. Grok's own OAuth sign-in isn't accepted by the Jumpseller server, so use the headers.
+
+### Muse Code
+
+Muse Code (Meta) doesn't load the toolkit's skills; add the MCP server to the `mcp_servers` block of its [settings file](https://dev.meta.ai/docs/muse-code/configuration#settings-file). It reads the two env vars (above) at runtime:
+
+```json
+{
+  "mcp_servers": {
+    "jumpseller": {
+      "transport": "streamable_http",
+      "url": "https://mcp.jumpseller.com",
+      "headers": {
+        "X-LOGIN-KEY": "${JUMPSELLER_LOGIN_KEY}",
+        "X-AUTH-TOKEN": "${JUMPSELLER_AUTH_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+Verify with `/mcp` in Muse Code: you should see `jumpseller` and its tools.
 
 For third-party app developers, register an app and use OAuth 2.0. See the [MCP server documentation](https://jumpseller.com/support/mcp-server/) for OAuth setup.
 
