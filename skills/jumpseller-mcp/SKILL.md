@@ -8,7 +8,7 @@ Use this skill when managing a Jumpseller store through the MCP server tools, or
 
 ## What is the Jumpseller MCP Server
 
-A live MCP (Model Context Protocol) server at `https://mcp.jumpseller.com` that lets AI agents act on a Jumpseller store in real time. It exposes 24 tools across seven domains.
+A live MCP (Model Context Protocol) server at `https://mcp.jumpseller.com` that lets AI agents act on a Jumpseller store in real time. It exposes 27 tools across eight domains.
 
 ## When to Use MCP vs the REST API
 
@@ -38,7 +38,7 @@ For non-interactive use, send the store's **Login key + Auth Token** (Admin Pane
 
 ## Available Tools
 
-24 tools across seven domains. Names and parameters are verified against the live server's `tools/list`; `*` marks a required parameter.
+27 tools across eight domains. Names and parameters are verified against the live server's `tools/list`; `*` marks a required parameter.
 
 ### Products (6 tools)
 
@@ -102,6 +102,16 @@ For non-interactive use, send the store's **Login key + Auth Token** (Admin Pane
 | Tool | Parameters | Description |
 |---|---|---|
 | `prepare_upload` | `filename*` | Returns a presigned POST upload target (valid 10 min, images only, max 10MB). POST the file to the returned S3 URL, then pass the `upload_id` to `create_product`/`update_product`. If you cannot make external HTTP requests, use base64 images instead. |
+
+### Help and navigation (3 tools)
+
+For anything the tools above cannot do, look up how to do it in the admin panel instead of guessing.
+
+| Tool | Parameters | Description |
+|---|---|---|
+| `search_support_docs` | `query*` | Search Jumpseller's support articles and return the most relevant matches. |
+| `list_admin_routes` | (none) | List the admin panel pages with their route ids, labels and sidebar paths. |
+| `recommend_admin_route` | `route_id*` | Return the admin page (label, sidebar path and link in the connected store) for a route id, e.g. `promotions` for discount codes. |
 
 ## Common Multi-Step Patterns
 

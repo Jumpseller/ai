@@ -4,6 +4,7 @@
 
 ### Changed
 - Codex signs in with OAuth (`codex mcp login jumpseller`); API token headers stay documented for CI.
+- `jumpseller-mcp` skill lists all 27 tools: adds `search_support_docs`, `list_admin_routes` and `recommend_admin_route`.
 
 ## [1.1.0] - 2026-10-13
 
