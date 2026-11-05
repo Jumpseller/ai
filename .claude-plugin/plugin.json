@@ -5,5 +5,7 @@
   "author": { "name": "Jumpseller" },
   "license": "MIT",
   "homepage": "https://github.com/Jumpseller/ai",
+  "privacyPolicyUrl": "https://jumpseller.com/terms/privacy/",
+  "icon": ".claude-plugin/icon.png",
   "keywords": ["jumpseller", "liquid", "rest-api", "mcp", "cli", "ecommerce", "theme"]
 }
