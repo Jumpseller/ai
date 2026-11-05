@@ -7,6 +7,7 @@
 - `jumpseller-mcp` skill lists all 27 tools: adds `search_support_docs`, `list_admin_routes` and `recommend_admin_route`.
 
 ### Added
+- Plugin icon and privacy policy URL for the Claude plugin directory.
 - README: MCP setup for Grok CLI and Muse Code, both with API token headers.
 
 ## [1.1.0] - 2026-10-13
